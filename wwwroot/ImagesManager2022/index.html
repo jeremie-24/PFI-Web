@@ -89,6 +89,14 @@
                         <div class="note">Cliquez-Déposez une image</div>
                     </form>
                 </div>
+
+                <div id="userDlg">
+                    <form id="userForm">
+                        <div class="note">Test</div>
+                    </form>
+                </div>
+
+                
                 <div id="confirmDeleteDlg">
                     <span id="confirmationMessage"></span>
                 </div>
@@ -238,7 +246,9 @@
             function  newUser(){
                 holdCheckETag = true;
                 userCreateMode = true;
-                $("#userDialog").dialog('open');
+                $("#userDlg").dialog('option', 'title', "Création de compte");
+                $("#userDlgOkBtn").text('Créer');
+                $("#userDlg").dialog('open');
             }
             function editimage(e) {
                 holdCheckETag = true;
@@ -402,7 +412,7 @@
 
 
                 // users
-                $("#userDialog").dialog({
+                $("#userDlg").dialog({
                     title: "...",
                     autoOpen: false,
                     modal: true,
@@ -416,21 +426,23 @@
                     maxHeight: 780,
                     position: { my: "top", at: "top", of: window },
                     buttons: [{
-                        id: "imageDlgOkBtn",
+                        id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
-                            let image = imageFromForm();
-                            if (image) {
+                            //let user = userFromForm();
+                            /*
+                            if (user) {
                                 if (createMode) {
-                                    POST(image, getImagesList, error);
+                                    //POST(image, getImagesList, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else
-                                    PUT(image, getImagesList, error);
-                                resetimageForm();
+                                    //PUT(image, getImagesList, error);
+                                //resetUserForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
+                            */
                         }
                     },
                     {
