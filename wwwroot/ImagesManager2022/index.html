@@ -59,6 +59,8 @@
                     </div>
                     <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                         data-toggle="tooltip"></span>
+                    <span class="cmd fa fa-user-plus" id="newUserCmd" title="Créer un compte"
+                    data-toggle="tooltip"></span>
                 </div>
             </div>
 
@@ -116,6 +118,8 @@
             let appendCount = 3;
             let previousScrollPosition = 0;
             let appendMode = false;
+
+            let userCreateMode = true;
 
             init_UI();
             HEAD(checkETag, error);
@@ -231,6 +235,11 @@
                 $("#imageDlgOkBtn").text("Ajouter");
                 $("#imageDlg").dialog('open');
             }
+            function  newUser(){
+                holdCheckETag = true;
+                userCreateMode = true;
+                $("#userDialog").dialog('open');
+            }
             function editimage(e) {
                 holdCheckETag = true;
                 createMode = false;
@@ -292,8 +301,10 @@
 
 
             function init_UI() {
-                $("#newImageCmd").click(newImage)
+                $("#newImageCmd").click(newImage);
+                $("#newUserCmd").click(newUser);
 
+                // Images
                 $("#imageDlg").dialog({
                     title: "...",
                     autoOpen: false,
@@ -387,6 +398,48 @@
                     if ($(".scrollContainer").scrollTop() + $(".scrollContainer").innerHeight() >= $("#imagesList").height()) {
                         getImagesList(false);
                     }
+                });
+
+
+                // users
+                $("#userDialog").dialog({
+                    title: "...",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 640,
+                    minWidth: 640,
+                    maxWidth: 640,
+                    height: 780,
+                    minHeight: 780,
+                    maxHeight: 780,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        id: "imageDlgOkBtn",
+                        text: "Title will be changed dynamically",
+                        click: function () {
+                            let image = imageFromForm();
+                            if (image) {
+                                if (createMode) {
+                                    POST(image, getImagesList, error);
+                                    $(".scrollContainer").scrollTop(0);
+                                }
+                                else
+                                    PUT(image, getImagesList, error);
+                                resetimageForm();
+                                holdCheckETag = false;
+                                $(this).dialog("close");
+                            }
+                        }
+                    },
+                    {
+                        text: "Annuler",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
                 });
             }
         </script>
