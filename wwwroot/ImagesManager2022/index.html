@@ -92,11 +92,29 @@
 
                 <div id="userDlg">
                     <form id="userForm">
-                        <div class="note">Test</div>
+                        <input type="hidden" id="Id_input" value="0">
+
+                        <label for="username_input">Nom d'usager</label>
+                        <input type="text" id="username_input" class="form-control" required>
+
+                        <label for="email_input">Courriel</label>
+                        <input type="text" id="email_input" class="form-control" required>
+
+                        <label for="password_input">Mot de passe</label>
+                        <input type="password" id="password_input" class="form-control" required>
+
+                        <label for="passwordConfirm_input">Confirmation</label>
+                        <input type="password" id="passwordConfirm_input" class="form-control MatchedPassword" required matchedPasswordId="password_input">
+
+                        <label for="avatar">Image</label>
+                        <div id='avatar' class='ImageUploader' defaultImage='images/No_Avatar.png'
+                        waitingImage='images/writing.gif'>
+                        </div>
+                        <div class="note">Cliquez-Déposez votre avatar</div>
                     </form>
                 </div>
 
-                
+
                 <div id="confirmDeleteDlg">
                     <span id="confirmationMessage"></span>
                 </div>
@@ -246,6 +264,7 @@
             function  newUser(){
                 holdCheckETag = true;
                 userCreateMode = true;
+                ImageUploader.imageRequired('avatar', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
@@ -429,6 +448,7 @@
                         id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
+                            console.log($("#userForm")[0].reportValidity())
                             //let user = userFromForm();
                             /*
                             if (user) {
