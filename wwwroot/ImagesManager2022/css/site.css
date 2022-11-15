@@ -20,8 +20,11 @@ body {
 }
 .headerLayout {
     display: grid;
-    grid-template-columns: 80px auto 60px 60px 60px;
+    grid-template-columns: 80px auto 60px 60px 60px 500px;
     align-items: center;
+}
+#logoutCmd {
+    margin-left: 300px;
 }
 .outLinedText {
     font-size: 30px !important;
