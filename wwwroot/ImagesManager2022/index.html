@@ -95,31 +95,23 @@
 
                 <div id="userDlg">
                     <form id="userForm">
-                        <input type="hidden" id="Id_input" value="0">
+                        <input type="hidden" id="Id_user_input" value="0">
+                        <input type="hidden" id="avatar_GUID_input" value="">
 
-                        <label for="username_input">Nom d'usager</label>
-                        <input type="text" id="username_input" class="form-control" required>
+                        <!--<label for="username_input">Nom d'usager</label>-->
+                        <input type="text" id="username_input" class="form-control userInput" placeholder="Nom d'usager" required>
 
 
-                        <label for="email_input ">Courriel</label>
-                        <input type="text" id="email_input" class="form-control Email" required>
+                        <!--<label for="email_input ">Courriel</label>-->
+                        <input type="text" id="email_input" class="form-control Email userInput" placeholder="Courriel" required>
 
-                        <label for="password_input">Mot de passe</label>
-                        <input type="password" id="password_input" class="form-control MatchedPassword" matchedPasswordId="passwordConfirm_input" required oninvalid="this.setCustomValidity('')">
+                        <!--<label for="password_input">Mot de passe</label>-->
+                        <input type="password" id="password_input" placeholder="Mot de passe" class="form-control MatchedPassword userInput" matchedPasswordId="passwordConfirm_input" required oninvalid="this.setCustomValidity('')">
 
-                        <label for="passwordConfirm_input">Confirmation</label>
-                        <input type="password" id="passwordConfirm_input" class="form-control">
+                        <!--<label for="passwordConfirm_input">Confirmation</label>-->
+                        <input type="password" id="passwordConfirm_input" placeholder="Confirmation " class="form-control userInput">
 
-                        <label for="email_input">Courriel</label>
-                        <input type="text" id="email_input" class="form-control" required>
-
-                        <label for="password_input">Mot de passe</label>
-                        <input type="password" id="password_input" class="form-control" required>
-
-                        <label for="passwordConfirm_input">Confirmation</label>
-                        <input type="password" id="passwordConfirm_input" class="form-control MatchedPassword" required matchedPasswordId="password_input">
-
-                        <label for="avatar">Image</label>
+                        <label for="avatar">Avatar</label>
                         <div id='avatar' class='ImageUploader' defaultImage='images/No_Avatar.png'
                         waitingImage='images/writing.gif'>
                         </div>
@@ -138,6 +130,16 @@
 
                         <input type="checkbox" name="remember_input" id="remember_input">
                         <label for="remember_input">Se souvenir de moi</label>
+                    </form>
+                </div>
+
+                <div id="verifyCodeDlg">
+                    <form id="verifyCodeForm">
+                        Consultez votre boîte de courriel pour connaître votre code de vérification et inscrivez-le-ci-dessous.
+                       
+                        <input type="text" placeholder="Code de vérification" id="verify_code_input" class="form-control" required>
+
+                        
                     </form>
                 </div>
 
@@ -381,6 +383,32 @@
                 $("#userDlg").dialog('open');
             }
 
+            /*
+            function userToForm(user) {
+
+                $("#username_input").val(user.Name);
+
+                ImageUploader.setImage('avatar', avatar.OriginalURL);
+            }
+            */
+            function userFromForm() {
+                if ($("#userForm")[0].checkValidity()) {
+                    let user = {
+                        Id: parseInt($("#Id_user_input").val()),
+                        Name: $("#username_input").val(),
+                        Email: $("#email_input").val(),
+                        Password: $("#password_input").val(),
+                        ImageData: ImageUploader.getImageData('avatar'),
+                        AvatarGUID: $("#avatar_GUID_input").val()
+                    };
+                    return user;
+                } else {
+                    $("#imageForm")[0].reportValidity()
+                }
+                return false;
+            }
+
+
             function init_UI() {
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
@@ -524,11 +552,11 @@
                     modal: true,
                     show: { effect: 'fade', speed: 400 },
                     hide: { effect: 'fade', speed: 400 },
-                    width: 640,
-                    minWidth: 640,
+                    width: 500,
+                    minWidth: 500,
                     maxWidth: 640,
-                    height: 780,
-                    minHeight: 780,
+                    height: 650,
+                    minHeight: 650,
                     maxHeight: 780,
                     position: { my: "top", at: "top", of: window },
                     buttons: [{
@@ -536,20 +564,20 @@
                         text: "Title will be changed dynamically",
                         click: function () {
                             console.log($("#userForm")[0].reportValidity())
-                            //let user = userFromForm();
-                            /*
+                            let user = userFromForm();
+                            
                             if (user) {
-                                if (createMode) {
-                                    //POST(image, getImagesList, error);
+                                if (userCreateMode) {
+                                    REGISTER(user, () => console.log(test), error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
-                                else
+                                //else
                                     //PUT(image, getImagesList, error);
                                 //resetUserForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
-                            */
+                            
                         }
                     },
                     {

@@ -1,5 +1,8 @@
-const apiBaseURL = "http://localhost:5000/api/images";
-const tokenBaseURL = "http://localhost:5000/token";
+const host = "http://localhost:5000";
+const apiBaseURL = host + "/api/images";
+const tokenBaseURL = host + "/token";
+const accountsApiUrl = host + "/accounts";
+const registerUrl = accountsApiUrl + "/register";
 
 function HEAD(successCallBack, errorCallBack) {
     $.ajax({
@@ -58,6 +61,17 @@ function DELETE(id, successCallBack, errorCallBack) {
 function TOKEN(data, successCallBack, errorCallBack) {
     $.ajax({
         url: tokenBaseURL,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: (data) => { successCallBack(data) },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+    });
+}
+
+function REGISTER(data, successCallBack, errorCallBack) {
+    $.ajax({
+        url: registerUrl,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
