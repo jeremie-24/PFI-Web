@@ -87,6 +87,35 @@
                         <div class="note">Cliquez-Déposez une image</div>
                     </form>
                 </div>
+<<<<<<< Updated upstream
+=======
+
+                <div id="userDlg">
+                    <form id="userForm">
+                        <input type="hidden" id="Id_input" value="0">
+
+                        <label for="username_input">Nom d'usager</label>
+                        <input type="text" id="username_input" class="form-control" required>
+
+                        <label for="email_input ">Courriel</label>
+                        <input type="text" id="email_input" class="form-control Email" required>
+
+                        <label for="password_input">Mot de passe</label>
+                        <input type="password" id="password_input" class="form-control MatchedPassword" matchedPasswordId="passwordConfirm_input" required oninvalid="this.setCustomValidity('')">
+
+                        <label for="passwordConfirm_input">Confirmation</label>
+                        <input type="password" id="passwordConfirm_input" class="form-control">
+
+                        <label for="avatar">Image</label>
+                        <div id='avatar' class='ImageUploader' defaultImage='images/No_Avatar.png'
+                        waitingImage='images/writing.gif'>
+                        </div>
+                        <div class="note">Cliquez-Déposez votre avatar</div>
+                    </form>
+                </div>
+
+
+>>>>>>> Stashed changes
                 <div id="confirmDeleteDlg">
                     <span id="confirmationMessage"></span>
                 </div>
@@ -98,6 +127,7 @@
         <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
         <script src="js/customValidation.js"></script>
         <script src="js/imageUploader.js"></script>
         <script src="js/api.js"></script>
@@ -231,6 +261,10 @@
                 $("#imageDlgOkBtn").text("Ajouter");
                 $("#imageDlg").dialog('open');
             }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
             function editimage(e) {
                 holdCheckETag = true;
                 createMode = false;
@@ -290,6 +324,14 @@
                 ImageUploader.setImage('image', image.OriginalURL);
             }
 
+            function  newUser(){
+                holdCheckETag = true;
+                userCreateMode = true;
+                ImageUploader.imageRequired('avatar', true);
+                $("#userDlg").dialog('option', 'title', "Création de compte");
+                $("#userDlgOkBtn").text('Créer');
+                $("#userDlg").dialog('open');
+            }
 
             function init_UI() {
                 $("#newImageCmd").click(newImage)
