@@ -308,12 +308,6 @@
             $("#loginDlgOkBtn").text("Connexion");
             $("#loginDlg").dialog('open');
         }
-        function logout() {
-            holdCheckETag = true;
-            $("#logoutDlg").dialog('option', 'title', 'Déconnexion');
-            $("#logoutDlgOkBtn").text("Connexion");
-            $("#logoutDlg").dialog('open');
-        }
         function newUser() {
             holdCheckETag = true;
             userCreateMode = true;
@@ -381,6 +375,14 @@
             ImageUploader.setImage('image', image.OriginalURL);
         }
 
+        function newUser() {
+            holdCheckETag = true;
+            userCreateMode = true;
+            ImageUploader.imageRequired('avatar', true);
+            $("#userDlg").dialog('option', 'title', "Création de compte");
+            $("#userDlgOkBtn").text('Créer');
+            $("#userDlg").dialog('open');
+        }
 
         function init_UI() {
             $("#logoutCmd").hide();
