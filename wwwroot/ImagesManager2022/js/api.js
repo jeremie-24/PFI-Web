@@ -69,6 +69,18 @@ function TOKEN(data, successCallBack, errorCallBack) {
     });
 }
 
+function GETAVATAR(data, successCallBack, errorCallBack) {
+    $.ajax({
+        url: tokenBaseURL,
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(data.userId),
+        authorization: data.Access_token,
+        success: (data) => { successCallBack(data) },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+    });
+}
+
 function REGISTER(data, successCallBack, errorCallBack) {
     $.ajax({
         url: registerUrl,

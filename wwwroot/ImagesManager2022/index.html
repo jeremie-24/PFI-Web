@@ -216,6 +216,14 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
+            function showAvatar(infos){
+
+            }
+
+            function displayAvatar(token){
+                GETAVATAR(token, showAvatar, error);
+            }
+
             function showLoginButtons(isLogged) {
                 if (isLogged) {
                     $("#loginCmd").hide();
@@ -237,6 +245,7 @@
                 else{
                     window.localStorage.setItem("token", null);
                 }
+                displayAvatar(token);
                 showLoginButtons(true);
                 getImagesList(true);
             }
@@ -513,6 +522,7 @@
                 var userToken = window.localStorage.getItem("token")
                 if (userToken != null && userToken != "null") {
                     token = userToken;
+                    displayAvatar(token);
                     showLoginButtons(true);
                 }
 
