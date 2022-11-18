@@ -10,6 +10,7 @@ module.exports =
             super(HttpContext, new usersRepository(), true /* read authorisation */);
         }
 
+        //accounts/index/15
         index(id) {
             if (!isNaN(id)) {
                 this.HttpContext.response.JSON(this.repository.get(id));
