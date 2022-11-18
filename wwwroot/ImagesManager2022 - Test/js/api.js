@@ -36,7 +36,7 @@ function POST(data, successCallBack, errorCallBack) {
         url: apiBaseURL,
         type: 'POST',
         contentType: 'application/json',
-        
+
         data: JSON.stringify(data),
         success: (data) => { successCallBack(data) },
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
@@ -66,6 +66,17 @@ function TOKEN(data, successCallBack, errorCallBack) {
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
+        success: (data) => { successCallBack(data) },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+    });
+}
+function GETAVATAR(data, successCallBack, errorCallBack) {
+    $.ajax({
+        url: tokenBaseURL,
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(data.userId),
+        authorization: data.Access_token,
         success: (data) => { successCallBack(data) },
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });

@@ -216,6 +216,13 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
+            function showAvatar(infos){
+
+            }
+
+function displayAvatar(token){
+    GETAVATAR(token, showAvatar, error);
+}
             function showLoginButtons(isLogged) {
                 if (isLogged) {
                     $("#loginCmd").hide();
@@ -230,6 +237,14 @@
             function changeToken(newToken) {
                 token = newToken.Access_token;
                 $("#loginDlg").dialog("close");
+                var isChecked = $("#remember_input").is(':checked')
+                if (isChecked) {
+                    window.localStorage.setItem("token", token);
+                }
+                else{
+                    window.localStorage.setItem("token", null);
+                }
+                displayAvatar(token);
                 showLoginButtons(true);
                 getImagesList(true);
             }
@@ -323,11 +338,25 @@
                 $("#imageDlgOkBtn").text("Ajouter");
                 $("#imageDlg").dialog('open');
             }
+            function logout() {
+                holdCheckETag = true;
+                $("#logoutDlg").dialog('option', 'title', 'Déconnexion');
+                $("#logoutDlgOkBtn").text("Déconnexion");
+                $("#logoutDlg").dialog('open');
+            }
             function login() {
                 holdCheckETag = true;
                 $("#loginDlg").dialog('option', 'title', 'Connexion');
                 $("#loginDlgOkBtn").text("Connexion");
                 $("#loginDlg").dialog('open');
+            }
+            function changeLoginToken() {
+                let login =
+                {
+                    Email: $("#email_input_login").val(),
+                    Password: $("#password_input_login").val()
+                }
+                TOKEN(login, changeToken, error);
             }
             function newUser() {
                 holdCheckETag = true;
@@ -476,7 +505,7 @@
                     };
                     return user;
                 } else {
-                    $("#userForm")[0].reportValidity()
+                    $("#imageForm")[0].reportValidity()
                 }
                 return false;
             }
@@ -512,6 +541,15 @@
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
                 $("#loginCmd").click(login);
+                $("#logoutCmd").click(logout);
+                $("#logoutCmd").hide();
+
+                var userToken = window.localStorage.getItem("token")
+                if (userToken != null && userToken != "null") {
+                    token = userToken;
+                    displayAvatar(token);
+                    showLoginButtons(true);
+                }
 
                 // Images
                 $("#imageDlg").dialog({
@@ -571,12 +609,7 @@
                         id: "loginDlgOkBtn",
                         text: "Login",
                         click: function () {
-                            let login =
-                            {
-                                Email: $("#email_input_login").val(),
-                                Password: $("#password_input_login").val()
-                            }
-                            TOKEN(login, changeToken, error);
+                            changeLoginToken();
                         }
                     },
                     {

@@ -3,6 +3,7 @@ const apiBaseURL = host + "/api/images";
 const tokenBaseURL = host + "/token";
 const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
+const verifyUrl = accountsApiUrl + "/verify";
 
 function HEAD(successCallBack, errorCallBack) {
     $.ajax({
@@ -88,6 +89,15 @@ function REGISTER(data, successCallBack, errorCallBack) {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: (data) => { successCallBack(data) },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+    });
+}
+function VERIFY(successCallBack, errorCallBack, id, code) {
+    let url = verifyUrl + `?id=${id}&code=${code}`;
+    $.ajax({
+        url: url,
+        type: 'GET',
+        success: data => { successCallBack(data); },
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }

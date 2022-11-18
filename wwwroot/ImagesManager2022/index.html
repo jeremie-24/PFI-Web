@@ -511,6 +511,32 @@
                 return false;
             }
 
+            function verifyCodeFromForm(){
+                if ($("#verifyCodeForm")[0].checkValidity()) {
+                    let user = {
+                        Id: parseInt($("#Id_user_input").val()),
+                        code: parseInt($("#verify_code_input").val()),
+                    };
+                    return user;
+                } else {
+                    $("#verifyCodeForm")[0].reportValidity()
+                }
+                return false;
+            }
+            function resetUserForm(){
+                $("#Id_user_input").val("0");
+                $("#username_input").val("");
+                $("#email_input").val("");
+                $("#password_input").val("");
+                $("#passwordConfirm_input").val("");
+                $("#avatar_GUID_input").val("");
+                ImageUploader.resetImage('avatar');
+            }
+
+            function resetVerifyCodeForm(){
+                $("#verify_code_input").val("");
+            }
+
 
             function init_UI() {
                 $("#newImageCmd").click(newImage);
@@ -701,21 +727,60 @@
                         id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
-                            console.log($("#userForm")[0].reportValidity())
+                            
                             let user = userFromForm();
 
                             if (user) {
                                 if (userCreateMode) {
-                                    REGISTER(user, () => console.log(test), error);
+                                    // TODO, login après et ouvrir dialog
+                                    REGISTER(user, () => $("#verifyCodeDlg").dialog('open'), error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 //else
-                                //PUT(image, getImagesList, error);
-                                //resetUserForm();
+                                //PUT(user, getImagesList, error);
+                                resetUserForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
+                        }
+                    },
+                    {
+                        text: "Annuler",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
+                });
 
+                $("#verifyCodeDlg").dialog({
+                    title: "Vérification de courriel",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 300,
+                    minWidth: 300,
+                    maxWidth: 300,
+                    height: 300,
+                    minHeight: 300,
+                    maxHeight: 500,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        id: "verifyCodeDlgOkBtn",
+                        text: "Envoyer",
+                        click: function () {
+
+                            let verifyCode = verifyCodeFromForm();
+                            if (verifyCode) {
+                                VERIFY((data) => console.log(data), error, verifyCode.Id, verifyCode.code);
+
+
+                                
+                                resetVerifyCodeForm();
+                                holdCheckETag = false;
+                                $(this).dialog("close");
+                            }
                         }
                     },
                     {
