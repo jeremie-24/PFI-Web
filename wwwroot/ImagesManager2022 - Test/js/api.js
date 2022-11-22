@@ -72,13 +72,11 @@ function TOKEN(data, successCallBack, errorCallBack) {
 }
 function GETAVATAR(data, successCallBack, errorCallBack) {
     $.ajax({
-        url: tokenBaseURL,
+        url: userBaseURL + "/" + data.UserId,
         type: 'GET',
-        contentType: 'application/json',
-        data: JSON.stringify(data.userId),
-        authorization: data.Access_token,
         success: (data) => { successCallBack(data) },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', data.Access_token ); }
     });
 }
 

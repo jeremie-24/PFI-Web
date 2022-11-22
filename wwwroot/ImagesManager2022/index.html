@@ -62,7 +62,7 @@
                     data-toggle="tooltip"></span>
                 <span id="loggedDiv">
                     <div><img id="userImage" src="" alt="Image_user"></div>
-                    <span class="cmd fa-solid fa-right-to-bracket" id="logoutCmd" title="Se déconnecter"
+                    <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter"
                         data-toggle="tooltip"></span>
                 </span>
 
@@ -189,8 +189,8 @@
             let appendCount = 3;
             let previousScrollPosition = 0;
             let appendMode = false;
-            let token = null;
-            let user = null;
+            let token;
+            let user ;
 
             let userCreateMode = true;
 
@@ -242,13 +242,15 @@
 
             function changeToken(newToken) {
                 token = newToken.Access_token;
-                $("#loginDlg").dialog("close");
+                //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
+                window.localStorage.setItem("token", token);
                 if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
-                    window.localStorage.setItem("token", null);
+                    // null
+                    console.log("remember me");
                 }
                 displayAvatar(newToken);
                 showLoginButtons(true);
@@ -541,7 +543,17 @@
             function resetVerifyCodeForm() {
                 $("#verify_code_input").val("");
             }
+            function firstLogin(newUserData){
+                let login =
+                {
+                    Email: newUserData.Email,
+                    Password: $("#password_input").val()
+                }
 
+                TOKEN(login, changeToken, error);
+                resetUserForm();
+                $("#verifyCodeDlg").dialog('open');
+            }
 
             function init_UI() {
                 $("#newImageCmd").click(newImage);
@@ -616,6 +628,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                            $("#loginDlg").dialog("close");
                         }
                     },
                     {
@@ -646,6 +659,7 @@
                         click: function () {
                             token = null;
                             showLoginButtons(false);
+                            holdCheckETag = false;
                             $(this).dialog("close");
                         }
                     },
@@ -738,12 +752,12 @@
                             if (user) {
                                 if (userCreateMode) {
                                     // TODO, login après et ouvrir dialog
-                                    REGISTER(user, () => $("#verifyCodeDlg").dialog('open'), error);
+                                    REGISTER(user, firstLogin , error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 //else
                                 //PUT(user, getImagesList, error);
-                                resetUserForm();
+                                //resetUserForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }

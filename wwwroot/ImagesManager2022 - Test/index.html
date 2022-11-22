@@ -60,8 +60,11 @@
                 <span class="cmd fa fa-user-plus" id="newUserCmd" title="Créer un compte" data-toggle="tooltip"></span>
                 <span class="cmd fa-solid fa-right-to-bracket" id="loginCmd" title="Se connecter"
                     data-toggle="tooltip"></span>
-                <span class="cmd fa-solid fa-right-to-bracket" id="logoutCmd" title="Se déconnecter"
-                    data-toggle="tooltip"></span>
+                    <span id="loggedDiv">
+                        <div><img id="userImage" src="" alt="Image_user"></div>
+                        <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter"
+                            data-toggle="tooltip"></span>
+                    </span>
             </div>
         </div>
 
@@ -186,7 +189,8 @@
             let appendCount = 3;
             let previousScrollPosition = 0;
             let appendMode = false;
-            let token = null;
+            let token;
+            let user;
 
             let userCreateMode = true;
 
@@ -216,35 +220,36 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
-            function showAvatar(infos){
-
+            function showAvatar(infos) {
+                user = infos;
+                $("#userImage").attr("src", infos.AvatarURL);
             }
 
-function displayAvatar(token){
-    GETAVATAR(token, showAvatar, error);
-}
+            function displayAvatar(token) {
+                GETAVATAR(token, showAvatar, error);
+            }
             function showLoginButtons(isLogged) {
                 if (isLogged) {
                     $("#loginCmd").hide();
-                    $("#logoutCmd").show();
+                    $("#loggedDiv").show();
                 }
                 else {
                     $("#loginCmd").show();
-                    $("#logoutCmd").hide();
+                    $("#loggedDiv").hide();
                 }
             }
 
             function changeToken(newToken) {
                 token = newToken.Access_token;
-                $("#loginDlg").dialog("close");
+                //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
                 if (isChecked) {
                     window.localStorage.setItem("token", token);
                 }
-                else{
+                else {
                     window.localStorage.setItem("token", null);
                 }
-                displayAvatar(token);
+                displayAvatar(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
@@ -522,7 +527,7 @@ function displayAvatar(token){
                 }
                 return false;
             }
-            function resetUserForm(){
+            function resetUserForm() {
                 $("#Id_user_input").val("0");
                 $("#username_input").val("");
                 $("#email_input").val("");
@@ -532,8 +537,20 @@ function displayAvatar(token){
                 ImageUploader.resetImage('avatar');
             }
 
-            function resetVerifyCodeForm(){
+            function resetVerifyCodeForm() {
                 $("#verify_code_input").val("");
+            }
+
+            function firstLogin(newUserData){
+                let login =
+                {
+                    Email: newUserData.Email,
+                    Password: $("#password_input").val()
+                }
+
+                TOKEN(login, changeToken, error);
+                resetUserForm();
+                $("#verifyCodeDlg").dialog('open');
             }
 
 
@@ -542,12 +559,13 @@ function displayAvatar(token){
                 $("#newUserCmd").click(newUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
-                $("#logoutCmd").hide();
+                $("#loggedDiv").hide();
 
                 var userToken = window.localStorage.getItem("token")
                 if (userToken != null && userToken != "null") {
                     token = userToken;
-                    displayAvatar(token);
+                    user = GETAVATAR(token, showAvatar, error);
+                    showAvatar(user);
                     showLoginButtons(true);
                 }
 
@@ -610,6 +628,7 @@ function displayAvatar(token){
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                            $("#loginDlg").dialog("close");
                         }
                     },
                     {
@@ -640,6 +659,7 @@ function displayAvatar(token){
                         click: function () {
                             token = null;
                             showLoginButtons(false);
+                            holdCheckETag = false;
                             $(this).dialog("close");
                         }
                     },
@@ -731,12 +751,12 @@ function displayAvatar(token){
                             if (user) {
                                 if (userCreateMode) {
                                     // TODO, login après et ouvrir dialog
-                                    REGISTER(user, () => $("#verifyCodeDlg").dialog('open'), error);
+                                    REGISTER(user, firstLogin , error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 //else
                                 //PUT(user, getImagesList, error);
-                                resetUserForm();
+                                //resetUserForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
