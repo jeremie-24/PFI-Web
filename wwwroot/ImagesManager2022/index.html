@@ -244,14 +244,13 @@
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
-                window.localStorage.setItem("token", token);
                 if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
-                    // null
-                    console.log("remember me");
+                    //rien
                 }
+                resetLoginForm();
                 updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
@@ -569,9 +568,8 @@
 
                 var userToken = JSON.parse(window.localStorage.getItem("token"));
                 if (userToken != null && userToken != "null") {
-                    token = userToken;
-                    user = GETUSER(token, updateUser, error);
-                    //showAvatar(user);
+                    token = userToken.Access_token;
+                    updateUser(userToken);
                     showLoginButtons(true);
                 }
 
@@ -634,7 +632,6 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
-                            resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -665,6 +662,7 @@
                         text: "Oui",
                         click: function () {
                             token = null;
+                            window.localStorage.setItem("token", token);
                             showLoginButtons(false);
                             holdCheckETag = false;
                             $(this).dialog("close");
