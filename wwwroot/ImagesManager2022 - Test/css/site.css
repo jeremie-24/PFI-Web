@@ -20,11 +20,18 @@ body {
 }
 .headerLayout {
     display: grid;
-    grid-template-columns: 80px auto 60px 60px 60px 500px;
+    grid-template-columns: 80px auto 60px 60px 60px 500px 60px;
     align-items: center;
 }
 #logoutCmd {
     margin-left: 300px;
+}
+#loggedDiv {
+    margin-left: 300px;
+}
+#userImage {
+    border-radius: 50%;
+    max-width: 30px;
 }
 .outLinedText {
     font-size: 30px !important;

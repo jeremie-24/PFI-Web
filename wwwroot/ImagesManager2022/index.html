@@ -248,9 +248,9 @@
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
-                    //rien
+                    console.log("no remember me");
                 }
-                resetLoginForm();
+                //resetLoginForm();
                 updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
@@ -382,6 +382,16 @@
                 $("#imageDlg").dialog('option', 'title', "Modification d'image");
                 $("#imageDlgOkBtn").text("Modifier");
                 $("#imageDlg").dialog('open');
+            }
+            function editUser(e) {
+                holdCheckETag = true;
+                userCreateMode = false;
+
+                ImageUploader.imageRequired('avatar', true);
+                $("#userDlg").dialog('option', 'title', "Modification du profil");
+                $("#userDlgOkBtn").text('Modifier');
+                $("#userDlg").dialog('open');
+
             }
             function deleteimage(e) {
                 holdCheckETag = true;
@@ -566,7 +576,11 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                var userToken = JSON.parse(window.localStorage.getItem("token"));
+                let tokenFromStorage = window.localStorage.getItem("token");
+                let userToken;
+                if(tokenFromStorage != null){
+                    userToken = JSON.parse(tokenFromStorage);
+                }
                 if (userToken != null && userToken != "null") {
                     token = userToken.Access_token;
                     updateUser(userToken);
@@ -632,6 +646,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                            resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -760,9 +775,10 @@
                                     REGISTER(user, firstLogin , error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
-                                //else
-                                //PUT(user, getImagesList, error);
-                                //resetUserForm();
+                                else{
+                                    MODIFY_USER(user,token, getImagesList, error);
+                                    resetUserForm();
+                                }
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }

@@ -245,7 +245,6 @@
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
-                window.localStorage.setItem("token", token);
                 if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
@@ -385,6 +384,16 @@
                 $("#imageDlgOkBtn").text("Modifier");
                 $("#imageDlg").dialog('open');
             }
+            function editUser(e) {
+                holdCheckETag = true;
+                userCreateMode = false;
+
+                ImageUploader.imageRequired('avatar', true);
+                $("#userDlg").dialog('option', 'title', "Modification du profil");
+                $("#userDlgOkBtn").text('Modifier');
+                $("#userDlg").dialog('open');
+
+            }
             function deleteimage(e) {
                 holdCheckETag = true;
                 imageIdToDelete = e.target.getAttribute("imageid")
@@ -407,6 +416,11 @@
                 $("#title_input").val("");
                 $("#description_input").val("");
                 ImageUploader.resetImage('image');
+            }
+            function resetLoginForm(){
+                $("#email_input_login").val("");
+                $("#password_input_login").val("");
+                $("#remember_input").prop('checked', false);
             }
             function imageFromForm() {
                 if ($("#imageForm")[0].checkValidity()) {
@@ -565,13 +579,18 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                var userToken = JSON.parse(window.localStorage.getItem("token"));
+                
+                let tokenFromStorage = window.localStorage.getItem("token");
+                let userToken;
+                if(tokenFromStorage != null){
+                    userToken = JSON.parse(tokenFromStorage);
+                }
                 if (userToken != null && userToken != "null") {
-                    token = userToken;
-                    user = GETUSER(token, updateUser, error);
-                    //showAvatar(user);
+                    token = userToken.Access_token;
+                    updateUser(userToken);
                     showLoginButtons(true);
                 }
+                
 
                 // Images
                 $("#imageDlg").dialog({
@@ -632,6 +651,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                            resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -758,9 +778,10 @@
                                     REGISTER(user, firstLogin , error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
-                                //else
-                                //PUT(user, getImagesList, error);
-                                //resetUserForm();
+                                else{
+                                    MODIFY_USER(user,token, getImagesList, error);
+                                    resetUserForm();
+                                }
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
