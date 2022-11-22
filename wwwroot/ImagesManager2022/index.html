@@ -245,7 +245,7 @@
                 $("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
                 if (isChecked) {
-                    window.localStorage.setItem("token", token);
+                    window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
                     window.localStorage.setItem("token", null);
@@ -550,11 +550,10 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                var userToken = window.localStorage.getItem("token")
+                var userToken = JSON.parse(window.localStorage.getItem("token"));
                 if (userToken != null && userToken != "null") {
-                    token = userToken;
-                    user = GETAVATAR(token, showAvatar, error);
-                    showAvatar(user);
+                    token = userToken.Access_token;
+                    displayAvatar(userToken);
                     showLoginButtons(true);
                 }
 
