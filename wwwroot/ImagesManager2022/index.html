@@ -407,6 +407,11 @@
                 $("#description_input").val("");
                 ImageUploader.resetImage('image');
             }
+            function resetLoginForm(){
+                $("#email_input_login").val("");
+                $("#password_input_login").val("");
+                $("#remember_input").prop('checked', false);
+            }
             function imageFromForm() {
                 if ($("#imageForm")[0].checkValidity()) {
                     let image = {
@@ -628,6 +633,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                            resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
