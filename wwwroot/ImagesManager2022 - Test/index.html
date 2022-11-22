@@ -220,13 +220,13 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
-            function showAvatar(infos) {
-                user = infos;
-                $("#userImage").attr("src", infos.AvatarURL);
+            function updateUserUI(data) {
+                user = data;
+                $("#userImage").attr("src", data.AvatarURL);
             }
 
-            function displayAvatar(token) {
-                GETAVATAR(token, showAvatar, error);
+            function updateUser(token) {
+                GETUSER(token, updateUserUI, error);
             }
             function showLoginButtons(isLogged) {
                 if (isLogged) {
@@ -243,13 +243,16 @@
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
+                window.localStorage.setItem("token", token);
                 if (isChecked) {
-                    window.localStorage.setItem("token", token);
+                    // user 
+                    console.log("remember me");
                 }
                 else {
-                    window.localStorage.setItem("token", null);
+                    // null
+                    console.log("remember me");
                 }
-                displayAvatar(newToken);
+                updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
@@ -564,8 +567,8 @@
                 var userToken = window.localStorage.getItem("token")
                 if (userToken != null && userToken != "null") {
                     token = userToken;
-                    user = GETAVATAR(token, showAvatar, error);
-                    showAvatar(user);
+                    user = GETUSER(token, updateUser, error);
+                    //showAvatar(user);
                     showLoginButtons(true);
                 }
 
