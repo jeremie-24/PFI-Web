@@ -4,6 +4,7 @@ const tokenBaseURL = host + "/token";
 const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
+const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
     $.ajax({
@@ -70,9 +71,9 @@ function TOKEN(data, successCallBack, errorCallBack) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
-function GETAVATAR(data, successCallBack, errorCallBack) {
+function GETUSER(data, successCallBack, errorCallBack) {
     $.ajax({
-        url: userBaseURL + "/" + data.UserId,
+        url: accountsGet + data.UserId,
         type: 'GET',
         success: (data) => { successCallBack(data) },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
