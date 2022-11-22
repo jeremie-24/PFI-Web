@@ -23,8 +23,12 @@ body {
     grid-template-columns: 80px auto 60px 60px 60px 500px;
     align-items: center;
 }
-#logoutCmd {
+#loggedDiv {
     margin-left: 300px;
+}
+#userImage {
+    border-radius: 50%;
+    max-width: 30px;
 }
 .outLinedText {
     font-size: 30px !important;
