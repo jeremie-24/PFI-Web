@@ -65,6 +65,7 @@
                         <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter"
                             data-toggle="tooltip"></span>
                     </span>
+
             </div>
         </div>
 
@@ -228,6 +229,7 @@
             function updateUser(token) {
                 GETUSER(token, updateUserUI, error);
             }
+
             function showLoginButtons(isLogged) {
                 if (isLogged) {
                     $("#loginCmd").hide();
@@ -245,8 +247,7 @@
                 var isChecked = $("#remember_input").is(':checked')
                 window.localStorage.setItem("token", token);
                 if (isChecked) {
-                    // user 
-                    console.log("remember me");
+                    window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
                     // null
@@ -564,7 +565,7 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                var userToken = window.localStorage.getItem("token")
+                var userToken = JSON.parse(window.localStorage.getItem("token"));
                 if (userToken != null && userToken != "null") {
                     token = userToken;
                     user = GETUSER(token, updateUser, error);
