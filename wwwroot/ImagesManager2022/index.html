@@ -244,11 +244,14 @@
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
                 var isChecked = $("#remember_input").is(':checked')
+                window.localStorage.setItem("token", token);
                 if (isChecked) {
-                    window.localStorage.setItem("token", token);
+                    // user 
+                    console.log("remember me");
                 }
                 else {
-                    window.localStorage.setItem("token", null);
+                    // null
+                    console.log("remember me");
                 }
                 displayAvatar(newToken);
                 showLoginButtons(true);
