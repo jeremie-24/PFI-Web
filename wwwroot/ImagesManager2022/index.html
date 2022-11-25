@@ -658,7 +658,7 @@
                             let image = imageFromForm();
                             if (image) {
                                 if (createMode) {
-                                    POST(image, getImagesList, error);
+                                    POST(image, user.Access_token, getImagesList, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else

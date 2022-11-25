@@ -33,14 +33,15 @@ function GET_ALL(successCallBack, errorCallBack, queryString = null) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
-function POST(data, successCallBack, errorCallBack) {
+function POST(data, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL,
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: (data) => { successCallBack(data) },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
 function PUT(bookmark, successCallBack, errorCallBack) {
