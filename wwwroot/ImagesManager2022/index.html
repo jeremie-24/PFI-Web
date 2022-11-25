@@ -243,14 +243,15 @@
             function changeToken(newToken) {
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
-                var isChecked = $("#remember_input").is(':checked')
+                var isChecked = $("#remember_input").prop('checked');
+                sessionStorage.setItem("token", JSON.stringify(newToken));
                 if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
                     console.log("no remember me");
                 }
-                //resetLoginForm();
+                resetLoginForm();
                 updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
@@ -577,8 +578,12 @@
                 $("#loggedDiv").hide();
 
                 let tokenFromStorage = window.localStorage.getItem("token");
+                let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
-                if(tokenFromStorage != null){
+                if (tokenFromSession != null){
+                    userToken = JSON.parse(tokenFromSession);
+                }
+                else if(tokenFromStorage != null){
                     userToken = JSON.parse(tokenFromStorage);
                 }
                 if (userToken != null && userToken != "null") {
@@ -646,7 +651,6 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
-                            resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -677,6 +681,7 @@
                         text: "Oui",
                         click: function () {
                             token = null;
+                            sessionStorage.setItem("token", token);
                             window.localStorage.setItem("token", token);
                             showLoginButtons(false);
                             holdCheckETag = false;
