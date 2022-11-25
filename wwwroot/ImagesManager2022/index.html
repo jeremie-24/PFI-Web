@@ -193,7 +193,7 @@
             let previousScrollPosition = 0;
             let appendMode = false;
             let token;
-            let user ;
+            let user;
 
             let userCreateMode = true;
 
@@ -292,6 +292,7 @@
 
             }
             
+
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
@@ -603,6 +604,7 @@
             function resetVerifyCodeForm() {
                 $("#verify_code_input").val("");
             }
+
             function firstLogin(newUserData){
                 let login =
                 {
@@ -615,6 +617,7 @@
                 $("#verifyCodeDlg").dialog('open');
             }
 
+
             function init_UI() {
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
@@ -622,15 +625,19 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                let tokenFromStorage = window.localStorage.getItem("token");
+                
+                  // TODO appeler token s'il est pas bon
+                //let tokenFromStorage = window.localStorage.getItem("token");
                 let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
                 if (tokenFromSession != null){
                     userToken = JSON.parse(tokenFromSession);
                 }
+                /*
                 else if(tokenFromStorage != null){
                     userToken = JSON.parse(tokenFromStorage);
                 }
+                */
                 if (userToken != null && userToken != "null") {
                     token = userToken.Access_token;
                     updateUser(userToken);
@@ -696,7 +703,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
-                               //resetLoginForm();
+                            //resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -833,6 +840,7 @@
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
+
                         }
                     },
                     {
@@ -872,6 +880,7 @@
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
+
                         }
                     },
                     {

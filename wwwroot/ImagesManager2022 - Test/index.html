@@ -91,6 +91,9 @@
                             waitingImage='images/writing.gif'>
                         </div>
                         <div class="note">Cliquez-Déposez une image</div>
+
+                        <input type="checkbox" name="shared_input" id="shared_input" checked>
+                        <label for="shared_input">Partager</label>
                     </form>
                 </div>
 
@@ -151,7 +154,6 @@
 
                     </form>
                 </div>
-
 
                 <div id="logoutDlg">
                     <form id="logoutForm">
@@ -240,9 +242,12 @@
                     $("#loggedDiv").hide();
                 }
             }
+
             function changeToken(newToken) {
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
+
+
                 sessionStorage.setItem("token", JSON.stringify(newToken));
                 /*
                 var isChecked = $("#remember_input").prop('checked');
@@ -464,7 +469,9 @@
                         Title: $("#title_input").val(),
                         Description: $("#description_input").val(),
                         ImageData: ImageUploader.getImageData('image'),
-                        Date: parseInt($("#date_input").val())
+                        Date: parseInt($("#date_input").val()),
+                        UserId: JSON.parse(sessionStorage.getItem("token")).UserId,
+                        Shared: $("#shared_input").prop("checked")
                     };
                     return image;
                 } else {
@@ -505,6 +512,7 @@
                 $("#date_input").val(Date.now());
                 $("#title_input").val("");
                 $("#description_input").val("");
+                $("#shared_input").prop("checked", true);
                 ImageUploader.resetImage('image');
             }
             function imageFromForm() {
@@ -515,7 +523,9 @@
                         Title: $("#title_input").val(),
                         Description: $("#description_input").val(),
                         ImageData: ImageUploader.getImageData('image'),
-                        Date: parseInt($("#date_input").val())
+                        Date: parseInt($("#date_input").val()),
+                        UserId: JSON.parse(sessionStorage.getItem("token")).UserId,
+                        Shared: $("#shared_input").prop("checked")
                     };
                     return image;
                 } else {
@@ -567,7 +577,7 @@
                 return false;
             }
 
-            function verifyCodeFromForm(){
+            function verifyCodeFromForm() {
                 if ($("#verifyCodeForm")[0].checkValidity()) {
                     let user = {
                         Id: parseInt($("#Id_user_input").val()),
@@ -630,7 +640,6 @@
                     updateUser(userToken);
                     showLoginButtons(true);
                 }
-                
 
                 // Images
                 $("#imageDlg").dialog({
@@ -812,7 +821,7 @@
                         id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
-                            
+
                             let user = userFromForm();
 
                             if (user) {
@@ -863,7 +872,7 @@
                                 VERIFY((data) => console.log(data), error, verifyCode.Id, verifyCode.code);
 
 
-                                
+
                                 resetVerifyCodeForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
