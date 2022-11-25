@@ -243,6 +243,10 @@
             function changeToken(newToken) {
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
+
+
+                sessionStorage.setItem("token", JSON.stringify(newToken));
+                /*
                 var isChecked = $("#remember_input").prop('checked');
                 sessionStorage.setItem("token", JSON.stringify(newToken));
                 if (isChecked) {
@@ -251,11 +255,40 @@
                 else {
                     console.log("no remember me");
                 }
+                */
+
+                rememberMe()
+
                 resetLoginForm();
                 updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
+            function rememberMe(){
+                let login =
+                {
+                    Email: $("#email_input_login").val(),
+                    Password: $("#password_input_login").val()
+                }
+                var isChecked = $("#remember_input").is(':checked')
+                
+                if (isChecked) {
+                    window.localStorage.setItem("login", JSON.stringify(login));
+                }
+                else {
+                    window.localStorage.setItem("login", null);
+                }
+            }
+            function useRememberMe(){
+                let loginFromStorage = JSON.parse(window.localStorage.getItem("login"));
+
+                if(loginFromStorage != null){
+                   $("#email_input_login").val(loginFromStorage.Email);
+                   $("#password_input_login").val(loginFromStorage.Password);
+                }
+
+            }
+            
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
@@ -354,6 +387,9 @@
             }
             function login() {
                 holdCheckETag = true;
+
+                useRememberMe();
+
                 $("#loginDlg").dialog('option', 'title', 'Connexion');
                 $("#loginDlgOkBtn").text("Connexion");
                 $("#loginDlg").dialog('open');
@@ -651,6 +687,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
+                               //resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -682,7 +719,7 @@
                         click: function () {
                             token = null;
                             sessionStorage.setItem("token", token);
-                            window.localStorage.setItem("token", token);
+                            //window.localStorage.setItem("token", token);
                             showLoginButtons(false);
                             holdCheckETag = false;
                             $(this).dialog("close");

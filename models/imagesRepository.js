@@ -19,9 +19,11 @@ module.exports =
                 if (image["GUID"] != "") {
                     bindedImage["OriginalURL"] = HttpContext.host + ImageFilesRepository.getImageFileURL(image["GUID"]);
                     bindedImage["ThumbnailURL"] = HttpContext.host + ImageFilesRepository.getThumbnailFileURL(image["GUID"]);
+                    bindedImage["AvatarURL"] = HttpContext.host + UsersRepository.get(image["UserId"]).AvatarURL;
                 } else {
                     bindedImage["OriginalURL"] = "";
                     bindedImage["ThumbnailURL"] = "";
+                    bindedImage["AvatarURL"] = "";
                 }
                 return bindedImage;
             }

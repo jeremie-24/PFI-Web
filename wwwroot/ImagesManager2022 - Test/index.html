@@ -240,22 +240,53 @@
                     $("#loggedDiv").hide();
                 }
             }
-
             function changeToken(newToken) {
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
-                var isChecked = $("#remember_input").is(':checked')
+                sessionStorage.setItem("token", JSON.stringify(newToken));
+                /*
+                var isChecked = $("#remember_input").prop('checked');
+                sessionStorage.setItem("token", JSON.stringify(newToken));
                 if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
-                    // null
-                    console.log("remember me");
+                    console.log("no remember me");
                 }
+                */
+                rememberMe()
+
+                resetLoginForm();
                 updateUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
+            function rememberMe(){
+                let login =
+                {
+                    Email: $("#email_input_login").val(),
+                    Password: $("#password_input_login").val()
+                }
+                var isChecked = $("#remember_input").is(':checked')
+                
+                if (isChecked) {
+                    window.localStorage.setItem("login", JSON.stringify(login));
+                }
+                else {
+                    window.localStorage.setItem("login", null);
+                }
+            }
+            function useRememberMe(){
+                let loginFromStorage = JSON.parse(window.localStorage.getItem("login"));
+
+                if(loginFromStorage != null){
+                   $("#email_input_login").val(loginFromStorage.Email);
+                   $("#password_input_login").val(loginFromStorage.Password);
+                }
+
+            }
+            
+
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
@@ -354,6 +385,9 @@
             }
             function login() {
                 holdCheckETag = true;
+
+                useRememberMe();
+
                 $("#loginDlg").dialog('option', 'title', 'Connexion');
                 $("#loginDlgOkBtn").text("Connexion");
                 $("#loginDlg").dialog('open');
@@ -579,12 +613,18 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                
-                let tokenFromStorage = window.localStorage.getItem("token");
+                  // TODO appeler token s'il est pas bon
+                //let tokenFromStorage = window.localStorage.getItem("token");
+                let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
-                if(tokenFromStorage != null){
+                if (tokenFromSession != null){
+                    userToken = JSON.parse(tokenFromSession);
+                }
+                /*
+                else if(tokenFromStorage != null){
                     userToken = JSON.parse(tokenFromStorage);
                 }
+                */
                 if (userToken != null && userToken != "null") {
                     token = userToken.Access_token;
                     updateUser(userToken);
@@ -651,7 +691,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
-                            resetLoginForm();
+                            //resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -682,6 +722,8 @@
                         text: "Oui",
                         click: function () {
                             token = null;
+                            sessionStorage.setItem("token", token);
+                            //window.localStorage.setItem("token", token);
                             showLoginButtons(false);
                             holdCheckETag = false;
                             $(this).dialog("close");
@@ -770,6 +812,7 @@
                         id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
+                            
                             let user = userFromForm();
 
                             if (user) {
