@@ -12,6 +12,7 @@ module.exports =
         constructor() {
             super(new ImageModel(), true /* cached */);
             this.setBindExtraDataMethod(this.bindImageURL);
+            this.userRepository = new UsersRepository();
         }
         bindImageURL(image) {
             if (image) {
@@ -19,9 +20,13 @@ module.exports =
                 if (image["GUID"] != "") {
                     bindedImage["OriginalURL"] = HttpContext.host + ImageFilesRepository.getImageFileURL(image["GUID"]);
                     bindedImage["ThumbnailURL"] = HttpContext.host + ImageFilesRepository.getThumbnailFileURL(image["GUID"]);
+                    bindedImage["AvatarURL"] =this.userRepository.get(image["UserId"]).AvatarURL;
+                    bindedImage["UserName"] =this.userRepository.get(image["UserId"]).Name;
                 } else {
                     bindedImage["OriginalURL"] = "";
                     bindedImage["ThumbnailURL"] = "";
+                    bindedImage["AvatarURL"] = "";
+                    bindedImage["UserName"] = "";
                 }
                 return bindedImage;
             }
