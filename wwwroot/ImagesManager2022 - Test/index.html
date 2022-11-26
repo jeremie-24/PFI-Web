@@ -180,6 +180,8 @@
         <script src="js/date.js"></script>
         <script defer>
             const periodicRefreshPeriod = 15;
+            const userSessionStorageName = "user";
+            const loginLocalStorageName = "login";
             let holdCheckETag = false;
             let currentETag = "";
             let createMode = true;
@@ -198,6 +200,8 @@
             let userCreateMode = true;
 
             init_UI();
+            initToken();
+
             HEAD(checkETag, error);
             setInterval(() => { HEAD(checkETag, error) }, periodicRefreshPeriod * 1000);
 
@@ -219,17 +223,20 @@
                         queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
                     }
                     return queryString;
-                }
+                }userImage
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
-            function updateUserUI(data) {
+            function updateUser(data) {
                 user = data;
+                // TODO userToForm
+                // TODO utiliser le user s'il existe dans session
+                sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
             }
 
-            function updateUser(token) {
-                GETUSER(token, updateUserUI, error);
+            function getUser(token) {
+                GETUSER(token, updateUser, error);
             }
 
             function showLoginButtons(isLogged) {
@@ -262,7 +269,7 @@
                 rememberMe()
 
                 resetLoginForm();
-                updateUser(newToken);
+                getUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
@@ -275,10 +282,10 @@
                 var isChecked = $("#remember_input").is(':checked')
                 
                 if (isChecked) {
-                    window.localStorage.setItem("login", JSON.stringify(login));
+                    window.localStorage.setItem(loginLocalStorageName, JSON.stringify(login));
                 }
                 else {
-                    window.localStorage.setItem("login", null);
+                    window.localStorage.removeItem(loginLocalStorageName);
                 }
             }
             function useRememberMe(){
@@ -287,6 +294,7 @@
                 if(loginFromStorage != null){
                    $("#email_input_login").val(loginFromStorage.Email);
                    $("#password_input_login").val(loginFromStorage.Password);
+                   $("#remember_input").prop("checked",true);
                 }
 
             }
@@ -391,7 +399,7 @@
             function login() {
                 holdCheckETag = true;
 
-                useRememberMe();
+                //useRememberMe();
 
                 $("#loginDlg").dialog('option', 'title', 'Connexion');
                 $("#loginDlgOkBtn").text("Connexion");
@@ -579,11 +587,12 @@
 
             function verifyCodeFromForm() {
                 if ($("#verifyCodeForm")[0].checkValidity()) {
-                    let user = {
-                        Id: parseInt($("#Id_user_input").val()),
+                    let verifyCode = {
+                        //Id: parseInt($("#Id_user_input").val()),
+                        Id: user.Id,
                         code: parseInt($("#verify_code_input").val()),
                     };
-                    return user;
+                    return verifyCode;
                 } else {
                     $("#verifyCodeForm")[0].reportValidity()
                 }
@@ -611,10 +620,31 @@
                 }
 
                 TOKEN(login, changeToken, error);
-                resetUserForm();
+                //resetUserForm();
                 $("#verifyCodeDlg").dialog('open');
             }
 
+            function initToken(){
+                let tokenFromSession =sessionStorage.getItem("token");
+                let userToken;
+                if (tokenFromSession != null){
+                    userToken = JSON.parse(tokenFromSession);
+                    if (userToken != null) {
+                        token = userToken.Access_token;
+
+                        let userFromSession = sessionStorage.getItem(userSessionStorageName);
+                        if(userFromSession != null){
+                            updateUser(JSON.parse(userFromSession));
+                        }
+                        else{
+                            getUser(userToken);
+                        }
+                        showLoginButtons(true);
+                    }
+                }
+
+                
+            }
 
             function init_UI() {
                 $("#newImageCmd").click(newImage);
@@ -623,23 +653,9 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                  // TODO appeler token s'il est pas bon
-                //let tokenFromStorage = window.localStorage.getItem("token");
-                let tokenFromSession = sessionStorage.getItem("token");
-                let userToken;
-                if (tokenFromSession != null){
-                    userToken = JSON.parse(tokenFromSession);
-                }
-                /*
-                else if(tokenFromStorage != null){
-                    userToken = JSON.parse(tokenFromStorage);
-                }
-                */
-                if (userToken != null && userToken != "null") {
-                    token = userToken.Access_token;
-                    updateUser(userToken);
-                    showLoginButtons(true);
-                }
+                useRememberMe();
+
+               
 
                 // Images
                 $("#imageDlg").dialog({
@@ -730,8 +746,8 @@
                         id: "logoutDlgOkBtn",
                         text: "Oui",
                         click: function () {
-                            token = null;
-                            sessionStorage.setItem("token", token);
+                            sessionStorage.removeItem("token");
+                            sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
                             showLoginButtons(false);
                             holdCheckETag = false;
@@ -826,7 +842,6 @@
 
                             if (user) {
                                 if (userCreateMode) {
-                                    // TODO, login après et ouvrir dialog
                                     REGISTER(user, firstLogin , error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
@@ -869,7 +884,9 @@
 
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
-                                VERIFY((data) => console.log(data), error, verifyCode.Id, verifyCode.code);
+                                //TODO verifier que ca marche a 100% avec local storage
+                                //TODO en train de faire: finir verifier, utiliser le local sotrage du user, userToForm 
+                                VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
 
 
 
@@ -890,7 +907,9 @@
                 });
             }
         </script>
+        
 
 </body>
 
 </html>
+
