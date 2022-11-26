@@ -229,8 +229,7 @@
 
             function updateUser(data) {
                 user = data;
-                // TODO userToForm
-                // TODO utiliser le user s'il existe dans session
+                userToForm(data);
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
             }
@@ -266,19 +265,21 @@
                     console.log("no remember me");
                 }
                 */
-                rememberMe()
+                //rememberMe()
 
                 resetLoginForm();
                 getUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
-            function rememberMe(){
+            function rememberMe(login){
+                /*
                 let login =
                 {
                     Email: $("#email_input_login").val(),
                     Password: $("#password_input_login").val()
                 }
+                */
                 var isChecked = $("#remember_input").is(':checked')
                 
                 if (isChecked) {
@@ -399,7 +400,7 @@
             function login() {
                 holdCheckETag = true;
 
-                //useRememberMe();
+                useRememberMe();
 
                 $("#loginDlg").dialog('option', 'title', 'Connexion');
                 $("#loginDlgOkBtn").text("Connexion");
@@ -411,6 +412,7 @@
                     Email: $("#email_input_login").val(),
                     Password: $("#password_input_login").val()
                 }
+                rememberMe(login);
                 TOKEN(login, changeToken, error);
             }
             function newUser() {
@@ -560,14 +562,17 @@
                 $("#userDlg").dialog('open');
             }
 
-            /*
+            
             function userToForm(user) {
  
+                $("#Id_user_input").val(user.Id);
                 $("#username_input").val(user.Name);
+                $("#email_input").val(user.Email);
+                $("#avatar_GUID_input").val(user.AvatarGUID);
  
-                ImageUploader.setImage('avatar', avatar.OriginalURL);
+                ImageUploader.setImage('avatar', user.AvatarURL);
             }
-            */
+            
             function userFromForm() {
                 if ($("#userForm")[0].checkValidity()) {
                     let user = {
@@ -653,7 +658,7 @@
                 $("#logoutCmd").click(logout);
                 $("#loggedDiv").hide();
 
-                useRememberMe();
+                //useRememberMe();
 
                
 
@@ -884,8 +889,7 @@
 
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
-                                //TODO verifier que ca marche a 100% avec local storage
-                                //TODO en train de faire: finir verifier, utiliser le local sotrage du user, userToForm 
+                     
                                 VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
 
 
@@ -908,7 +912,7 @@
             }
         </script>
         
-
+<!--           //TODO modifierUser-->
 </body>
 
 </html>
