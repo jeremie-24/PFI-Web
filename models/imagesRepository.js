@@ -53,7 +53,7 @@ module.exports =
         }
         remove(id) {
             //TODO AJOUTER UNE VÉRIF.
-            let token = TokenManager.find(utilities.getAuthorization(require('../httpContext').get()));
+            let token = utilities.getToken(require('../httpContext').get());
             let foundImage = super.get(id);
             if (token != null && foundImage && foundImage["UserId"] == token["UserId"]) {
                 ImageFilesRepository.removeImageFile(foundImage["GUID"]);

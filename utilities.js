@@ -28,6 +28,9 @@ exports.deleteByIndex = (array, indexToDelete) => {
 exports.getAuthorization = (httpContext) => {
     return httpContext.req.headers["authorization"];
 }
+exports.getToken = (httpContext) => {
+    return TokenManager.find(exports.getAuthorization(httpContext));
+}
 exports.removeQueryString = removeQueryString;
 function removeQueryString(url) {
     let queryStringMarkerPos = url.indexOf('?');
