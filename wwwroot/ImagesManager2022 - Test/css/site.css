@@ -32,6 +32,7 @@ body {
 #userImage {
     border-radius: 50%;
     max-width: 30px;
+    height: 30px;
 }
 .outLinedText {
     font-size: 30px !important;
