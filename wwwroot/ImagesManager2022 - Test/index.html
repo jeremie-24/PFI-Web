@@ -57,15 +57,15 @@
                 </div>
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                <span class="cmd fa fa-user-plus" id="newUserCmd" title="Créer un compte" data-toggle="tooltip"></span>
-                <span class="cmd fa-solid fa-right-to-bracket" id="loginCmd" title="Se connecter"
-                    data-toggle="tooltip"></span>
-                    <span id="loggedDiv">
-                        <div><img id="userImage" src="" alt="Image_user"></div>
-                        <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter"
-                            data-toggle="tooltip"></span>
-                    </span>
+                <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd"  title="Créer un compte" data-toggle="tooltip"></span>
 
+
+            </div>
+            <div class="rightHeaderLayout">
+                <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd"  title="Se connecter"
+                    data-toggle="tooltip"></span>
+                <div class="loggedDiv" id="modifyUserCmd"><img id="userImage" src="" alt="Image_user" ></div>
+                <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"  data-toggle="tooltip"></span>
             </div>
         </div>
 
@@ -223,7 +223,7 @@
                         queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
                     }
                     return queryString;
-                }userImage
+                } userImage
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
@@ -240,12 +240,12 @@
 
             function showLoginButtons(isLogged) {
                 if (isLogged) {
-                    $("#loginCmd").hide();
-                    $("#loggedDiv").show();
+                    $(".loginDiv").hide();
+                    $(".loggedDiv").show();
                 }
                 else {
-                    $("#loginCmd").show();
-                    $("#loggedDiv").hide();
+                    $(".loginDiv").show();
+                    $(".loggedDiv").hide();
                 }
             }
 
@@ -272,7 +272,7 @@
                 showLoginButtons(true);
                 getImagesList(true);
             }
-            function rememberMe(login){
+            function rememberMe(login) {
                 /*
                 let login =
                 {
@@ -281,7 +281,7 @@
                 }
                 */
                 var isChecked = $("#remember_input").is(':checked')
-                
+
                 if (isChecked) {
                     window.localStorage.setItem(loginLocalStorageName, JSON.stringify(login));
                 }
@@ -289,17 +289,17 @@
                     window.localStorage.removeItem(loginLocalStorageName);
                 }
             }
-            function useRememberMe(){
+            function useRememberMe() {
                 let loginFromStorage = JSON.parse(window.localStorage.getItem("login"));
 
-                if(loginFromStorage != null){
-                   $("#email_input_login").val(loginFromStorage.Email);
-                   $("#password_input_login").val(loginFromStorage.Password);
-                   $("#remember_input").prop("checked",true);
+                if (loginFromStorage != null) {
+                    $("#email_input_login").val(loginFromStorage.Email);
+                    $("#password_input_login").val(loginFromStorage.Password);
+                    $("#remember_input").prop("checked", true);
                 }
 
             }
-            
+
 
 
             function refreshimagesList(images, ETag) {
@@ -415,14 +415,7 @@
                 rememberMe(login);
                 TOKEN(login, changeToken, error);
             }
-            function newUser() {
-                holdCheckETag = true;
-                userCreateMode = true;
-                ImageUploader.imageRequired('avatar', true);
-                $("#userDlg").dialog('option', 'title', "Création de compte");
-                $("#userDlgOkBtn").text('Créer');
-                $("#userDlg").dialog('open');
-            }
+
             function editimage(e) {
                 holdCheckETag = true;
                 createMode = false;
@@ -466,7 +459,7 @@
                 $("#description_input").val("");
                 ImageUploader.resetImage('image');
             }
-            function resetLoginForm(){
+            function resetLoginForm() {
                 $("#email_input_login").val("");
                 $("#password_input_login").val("");
                 $("#remember_input").prop('checked', false);
@@ -557,22 +550,32 @@
                 holdCheckETag = true;
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
+                $("#password_input").prop('required',true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
             }
+            function modifyUser() {
+                holdCheckETag = true;
+                userCreateMode = false;
+                ImageUploader.imageRequired('avatar', false);
+                $("#password_input").prop('required',false);
+                $("#userDlg").dialog('option', 'title', "Modification de compte");
+                $("#userDlgOkBtn").text('Modifier');
+                $("#userDlg").dialog('open');
+            }
 
-            
+
             function userToForm(user) {
- 
+
                 $("#Id_user_input").val(user.Id);
                 $("#username_input").val(user.Name);
                 $("#email_input").val(user.Email);
                 $("#avatar_GUID_input").val(user.AvatarGUID);
- 
+
                 ImageUploader.setImage('avatar', user.AvatarURL);
             }
-            
+
             function userFromForm() {
                 if ($("#userForm")[0].checkValidity()) {
                     let user = {
@@ -617,7 +620,7 @@
                 $("#verify_code_input").val("");
             }
 
-            function firstLogin(newUserData){
+            function firstLogin(newUserData) {
                 let login =
                 {
                     Email: newUserData.Email,
@@ -629,38 +632,40 @@
                 $("#verifyCodeDlg").dialog('open');
             }
 
-            function initToken(){
-                let tokenFromSession =sessionStorage.getItem("token");
+            function initToken() {
+                let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
-                if (tokenFromSession != null){
+                if (tokenFromSession != null) {
                     userToken = JSON.parse(tokenFromSession);
                     if (userToken != null) {
                         token = userToken.Access_token;
 
                         let userFromSession = sessionStorage.getItem(userSessionStorageName);
-                        if(userFromSession != null){
+                        if (userFromSession != null) {
                             updateUser(JSON.parse(userFromSession));
                         }
-                        else{
+                        else {
                             getUser(userToken);
                         }
                         showLoginButtons(true);
                     }
                 }
 
-                
+
             }
 
             function init_UI() {
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
+                $("#modifyUserCmd").click(newUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
-                $("#loggedDiv").hide();
+                //$(".loggedDiv").hide();
+                showLoginButtons(false);
 
                 //useRememberMe();
 
-               
+
 
                 // Images
                 $("#imageDlg").dialog({
@@ -668,7 +673,7 @@
                     autoOpen: false,
                     modal: true,
                     show: { effect: 'fade', speed: 400 },
-                    hide: { effect: 'fade', speed: 400 },
+                    hide: { effshowLoginButtonsect: 'fade', speed: 400 },
                     width: 640,
                     minWidth: 640,
                     maxWidth: 640,
@@ -754,6 +759,7 @@
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
+                            //TODO logout du serveur
                             showLoginButtons(false);
                             holdCheckETag = false;
                             $(this).dialog("close");
@@ -847,11 +853,11 @@
 
                             if (user) {
                                 if (userCreateMode) {
-                                    REGISTER(user, firstLogin , error);
+                                    REGISTER(user, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
-                                else{
-                                    MODIFY_USER(user,token, getImagesList, error);
+                                else {
+                                    MODIFY_USER(user, token, getImagesList, error);
                                     resetUserForm();
                                 }
                                 holdCheckETag = false;
@@ -889,7 +895,7 @@
 
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
-                     
+
                                 VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
 
 
@@ -911,9 +917,8 @@
                 });
             }
         </script>
-        
-<!--           //TODO modifierUser-->
+
+        <!--           //TODO modifierUser, empecher image si pas verified-->
 </body>
 
 </html>
-
