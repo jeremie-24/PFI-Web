@@ -1,6 +1,7 @@
 const host = "http://localhost:5000";
 const apiBaseURL = host + "/api/images";
 const tokenBaseURL = host + "/token";
+const userBaseURL = host + "/api/accounts";
 const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
@@ -33,33 +34,35 @@ function GET_ALL(successCallBack, errorCallBack, queryString = null) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
-function POST(data, successCallBack, errorCallBack) {
+function POST(data, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL,
         type: 'POST',
         contentType: 'application/json',
-
         data: JSON.stringify(data),
         success: (data) => { successCallBack(data) },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
-function PUT(bookmark, successCallBack, errorCallBack) {
+function PUT(bookmark, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + bookmark.Id,
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(bookmark),
         success: () => { successCallBack() },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
-function DELETE(id, successCallBack, errorCallBack) {
+function DELETE(id, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + id,
         type: 'DELETE',
         success: () => { successCallBack() },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
 function TOKEN(data, successCallBack, errorCallBack) {
@@ -72,6 +75,7 @@ function TOKEN(data, successCallBack, errorCallBack) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
+
 function GETUSER(data, successCallBack, errorCallBack) {
     $.ajax({
         url: accountsGet + data.UserId,

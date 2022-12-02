@@ -60,6 +60,8 @@
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd"  title="Créer un compte" data-toggle="tooltip"></span>
 
 
+
+
             </div>
             <div class="rightHeaderLayout">
                 <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd"  title="Se connecter"
@@ -223,7 +225,7 @@
                         queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
                     }
                     return queryString;
-                } userImage
+                }
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
@@ -305,7 +307,8 @@
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
 
-                    $("#imagesList").append(
+                    if (image.Shared){
+                        $("#imagesList").append(
                         $(` 
                                 <div class='imageLayout'>
                                     <div class='imageHeader'>
@@ -321,15 +324,19 @@
                                                 data-toggle="tooltip">
                                         </div>
                                     </div>
-                                    <a href="${image.OriginalURL}" target="_blank">
+                                    <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
+                                        <img class="avatarOnImage" src="${image.AvatarURL}" alt="">
                                         <div    class='image' 
-                                                style="background-image:url('${image.ThumbnailURL}')">
+                                                style="background-image:url('${image.ThumbnailURL}')"
+                                                title="Image de ${image.UserName}" 
+                                                data-toggle="tooltip">
                                         </div>
                                     </a>
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
                     );
+                    }
                 }
                 currentETag = ETag;
                 previousScrollPosition = $(".scrollContainer").scrollTop();
@@ -457,6 +464,7 @@
                 $("#date_input").val(Date.now());
                 $("#title_input").val("");
                 $("#description_input").val("");
+                $("#shared_input").prop("checked", true)
                 ImageUploader.resetImage('image');
             }
             function resetLoginForm() {
@@ -544,6 +552,7 @@
                 $("#title_input").val(image.Title);
                 $("#description_input").val(image.Description);
                 ImageUploader.setImage('image', image.OriginalURL);
+                //TODO shared?
             }
 
             function newUser() {
@@ -789,7 +798,7 @@
                         click: function () {
                             holdCheckETag = false;
                             if (imageIdToDelete)
-                                DELETE(imageIdToDelete, getImagesList, error);
+                            DELETE(imageIdToDelete, token, getImagesList, error);
                             imageIdToDelete = 0;
                             $(this).dialog("close");
                         }

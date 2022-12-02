@@ -57,14 +57,19 @@
                 </div>
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                <span class="cmd fa fa-user-plus" id="newUserCmd" title="Créer un compte" data-toggle="tooltip"></span>
-                <span class="cmd fa-solid fa-right-to-bracket" id="loginCmd" title="Se connecter"
+                <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
                     data-toggle="tooltip"></span>
-                <span id="loggedDiv">
-                    <div><img id="userImage" src="" alt="Image_user"></div>
-                    <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter" data-toggle="tooltip"></span>
-                </span>
 
+
+
+
+            </div>
+            <div class="rightHeaderLayout">
+                <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd" title="Se connecter"
+                    data-toggle="tooltip"></span>
+                <div class="loggedDiv" id="modifyUserCmd"><img id="userImage" src="" alt="Image_user"></div>
+                <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
+                    data-toggle="tooltip"></span>
             </div>
         </div>
 
@@ -197,6 +202,8 @@
             let userCreateMode = true;
 
             init_UI();
+            initToken();
+
             HEAD(checkETag, error);
             setInterval(() => { HEAD(checkETag, error) }, periodicRefreshPeriod * 1000);
 
@@ -222,23 +229,25 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
             }
 
-            function updateUserUI(data) {
+            function updateUser(data) {
                 user = data;
+                userToForm(data);
+                sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
             }
 
-            function updateUser(token) {
-                GETUSER(token, updateUserUI, error);
+            function getUser(token) {
+                GETUSER(token, updateUser, error);
             }
 
             function showLoginButtons(isLogged) {
                 if (isLogged) {
-                    $("#loginCmd").hide();
-                    $("#loggedDiv").show();
+                    $(".loginDiv").hide();
+                    $(".loggedDiv").show();
                 }
                 else {
-                    $("#loginCmd").show();
-                    $("#loggedDiv").hide();
+                    $(".loginDiv").show();
+                    $(".loggedDiv").hide();
                 }
             }
 
@@ -258,27 +267,28 @@
                     console.log("no remember me");
                 }
                 */
-
-                rememberMe()
+                //rememberMe()
 
                 resetLoginForm();
-                updateUser(newToken);
+                getUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
             }
-            function rememberMe() {
+            function rememberMe(login) {
+                /*
                 let login =
                 {
                     Email: $("#email_input_login").val(),
                     Password: $("#password_input_login").val()
                 }
+                */
                 var isChecked = $("#remember_input").is(':checked')
 
                 if (isChecked) {
-                    window.localStorage.setItem("login", JSON.stringify(login));
+                    window.localStorage.setItem(loginLocalStorageName, JSON.stringify(login));
                 }
                 else {
-                    window.localStorage.setItem("login", null);
+                    window.localStorage.removeItem(loginLocalStorageName);
                 }
             }
             function useRememberMe() {
@@ -287,6 +297,7 @@
                 if (loginFromStorage != null) {
                     $("#email_input_login").val(loginFromStorage.Email);
                     $("#password_input_login").val(loginFromStorage.Password);
+                    $("#remember_input").prop("checked", true);
                 }
 
             }
@@ -296,9 +307,9 @@
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
 
-                    if (image.Shared){
+                    if (image.Shared) {
                         $("#imagesList").append(
-                        $(` 
+                            $(` 
                                 <div class='imageLayout'>
                                     <div class='imageHeader'>
                                         <div class="imageTitle">${image.Title}</div>
@@ -324,7 +335,7 @@
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
-                    );
+                        );
                     }
                 }
                 currentETag = ETag;
@@ -408,16 +419,10 @@
                     Email: $("#email_input_login").val(),
                     Password: $("#password_input_login").val()
                 }
+                rememberMe(login);
                 TOKEN(login, changeToken, error);
             }
-            function newUser() {
-                holdCheckETag = true;
-                userCreateMode = true;
-                ImageUploader.imageRequired('avatar', true);
-                $("#userDlg").dialog('option', 'title', "Création de compte");
-                $("#userDlgOkBtn").text('Créer');
-                $("#userDlg").dialog('open');
-            }
+
             function editimage(e) {
                 holdCheckETag = true;
                 createMode = false;
@@ -547,25 +552,37 @@
                 $("#title_input").val(image.Title);
                 $("#description_input").val(image.Description);
                 ImageUploader.setImage('image', image.OriginalURL);
+                //TODO shared?
             }
 
             function newUser() {
                 holdCheckETag = true;
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
+                $("#password_input").prop('required',true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
             }
-
-            /*
-            function userToForm(user) {
- 
-                $("#username_input").val(user.Name);
- 
-                ImageUploader.setImage('avatar', avatar.OriginalURL);
+            function modifyUser() {
+                holdCheckETag = true;
+                userCreateMode = false;
+                ImageUploader.imageRequired('avatar', false);
+                $("#password_input").prop('required',false);
+                $("#userDlg").dialog('option', 'title', "Modification de compte");
+                $("#userDlgOkBtn").text('Modifier');
+                $("#userDlg").dialog('open');
             }
-            */
+
+            function userToForm(user) {
+
+                $("#Id_user_input").val(user.Id);
+                $("#username_input").val(user.Name);
+                $("#email_input").val(user.Email);
+                $("#avatar_GUID_input").val(user.AvatarGUID);
+
+                ImageUploader.setImage('avatar', user.AvatarURL);
+            }
             function userFromForm() {
                 if ($("#userForm")[0].checkValidity()) {
                     let user = {
@@ -585,11 +602,12 @@
 
             function verifyCodeFromForm() {
                 if ($("#verifyCodeForm")[0].checkValidity()) {
-                    let user = {
-                        Id: parseInt($("#Id_user_input").val()),
+                    let verifyCode = {
+                        //Id: parseInt($("#Id_user_input").val()),
+                        Id: user.Id,
                         code: parseInt($("#verify_code_input").val()),
                     };
-                    return user;
+                    return verifyCode;
                 } else {
                     $("#verifyCodeForm")[0].reportValidity()
                 }
@@ -608,6 +626,7 @@
             function resetVerifyCodeForm() {
                 $("#verify_code_input").val("");
             }
+
             function firstLogin(newUserData) {
                 let login =
                 {
@@ -616,36 +635,42 @@
                 }
 
                 TOKEN(login, changeToken, error);
-                resetUserForm();
+                //resetUserForm();
                 $("#verifyCodeDlg").dialog('open');
             }
 
-
-            function init_UI() {
-                $("#newImageCmd").click(newImage);
-                $("#newUserCmd").click(newUser);
-                $("#loginCmd").click(login);
-                $("#logoutCmd").click(logout);
-                $("#loggedDiv").hide();
-
-                
-                  // TODO appeler token s'il est pas bon
-                //let tokenFromStorage = window.localStorage.getItem("token");
+            function initToken() {
                 let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
                 if (tokenFromSession != null) {
                     userToken = JSON.parse(tokenFromSession);
+                    if (userToken != null) {
+                        token = userToken.Access_token;
+
+                        let userFromSession = sessionStorage.getItem(userSessionStorageName);
+                        if (userFromSession != null) {
+                            updateUser(JSON.parse(userFromSession));
+                        }
+                        else {
+                            getUser(userToken);
+                        }
+                        showLoginButtons(true);
+                    }
                 }
-                /*
-                else if(tokenFromStorage != null){
-                    userToken = JSON.parse(tokenFromStorage);
-                }
-                */
-                if (userToken != null && userToken != "null") {
-                    token = userToken.Access_token;
-                    updateUser(userToken);
-                    showLoginButtons(true);
-                }
+
+
+            }
+
+            function init_UI() {
+                $("#newImageCmd").click(newImage);
+                $("#newUserCmd").click(newUser);
+                $("#modifyUserCmd").click(newUser);
+                $("#loginCmd").click(login);
+                $("#logoutCmd").click(logout);
+                //$(".loggedDiv").hide();
+                showLoginButtons(false);
+
+                  //useRememberMe();
 
                 // Images
                 $("#imageDlg").dialog({
@@ -736,9 +761,10 @@
                         id: "logoutDlgOkBtn",
                         text: "Oui",
                         click: function () {
-                            token = null;
-                            sessionStorage.setItem("token", token);
+                            sessionStorage.removeItem("token");
+                            sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
+                            //TODO logout du serveur
                             showLoginButtons(false);
                             holdCheckETag = false;
                             $(this).dialog("close");
@@ -832,7 +858,6 @@
 
                             if (user) {
                                 if (userCreateMode) {
-                                    // TODO, login après et ouvrir dialog
                                     REGISTER(user, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
@@ -875,7 +900,8 @@
 
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
-                                VERIFY((data) => console.log(data), error, verifyCode.Id, verifyCode.code);
+                                
+                                VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
 
 
 

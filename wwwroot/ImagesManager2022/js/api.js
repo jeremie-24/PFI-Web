@@ -5,6 +5,7 @@ const userBaseURL = host + "/api/accounts";
 const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
+const userModifyUrl = accountsApiUrl + "/modify";
 const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
@@ -102,5 +103,17 @@ function VERIFY(successCallBack, errorCallBack, id, code) {
         type: 'GET',
         success: data => { successCallBack(data); },
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
+    });
+}
+
+function MODIFY_USER(user, accessToken, successCallBack, errorCallBack){
+    $.ajax({
+        url: userModifyUrl + "/" + user.Id,
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(user),
+        success: () => { successCallBack() },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', accessToken ); }
     });
 }

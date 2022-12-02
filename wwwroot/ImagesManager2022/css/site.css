@@ -17,14 +17,22 @@ body {
     flex-wrap: wrap;
     background-image: linear-gradient(180deg, lightgray, gray);
     align-items: center;
+    justify-content: space-between;
 }
 .headerLayout {
     display: grid;
-    grid-template-columns: 80px auto 60px 60px 60px 500px 60px;
+    grid-template-columns: 80px auto 60px 60px  ;
     align-items: center;
 }
 .imageContainer {
     position: relative;
+    
+}
+.rightHeaderLayout{
+    display: grid;
+    grid-template-columns: 60px auto 60px;
+    align-self: right;
+    align-items: center;
 }
 .avatarOnImage {
     position: absolute;
@@ -32,12 +40,18 @@ body {
     max-height: 50px;
     border-radius: 50%;
 }
+/*
+#logoutCmd {
+    margin-left: 300px;
+}
 #loggedDiv {
     margin-left: 300px;
 }
+*/
 #userImage {
     border-radius: 50%;
     max-width: 30px;
+    height: 30px;
 }
 .outLinedText {
     font-size: 30px !important;
