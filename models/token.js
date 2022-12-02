@@ -1,4 +1,5 @@
 const Model = require('./model');
+const tokens = require('../data/Tokens.json')
 module.exports =
     class Token extends Model {
         constructor() {

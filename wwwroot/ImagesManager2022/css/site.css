@@ -23,6 +23,15 @@ body {
     grid-template-columns: 80px auto 60px 60px 60px 500px 60px;
     align-items: center;
 }
+.imageContainer {
+    position: relative;
+}
+.avatarOnImage {
+    position: absolute;
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+}
 #loggedDiv {
     margin-left: 300px;
 }

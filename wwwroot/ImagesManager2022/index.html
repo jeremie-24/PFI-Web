@@ -62,8 +62,7 @@
                     data-toggle="tooltip"></span>
                 <span id="loggedDiv">
                     <div><img id="userImage" src="" alt="Image_user"></div>
-                    <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter"
-                        data-toggle="tooltip"></span>
+                    <span class="cmd fa fa-sign-out" id="logoutCmd" title="Se déconnecter" data-toggle="tooltip"></span>
                 </span>
 
             </div>
@@ -193,7 +192,7 @@
             let previousScrollPosition = 0;
             let appendMode = false;
             let token;
-            let user ;
+            let user;
 
             let userCreateMode = true;
 
@@ -267,14 +266,14 @@
                 showLoginButtons(true);
                 getImagesList(true);
             }
-            function rememberMe(){
+            function rememberMe() {
                 let login =
                 {
                     Email: $("#email_input_login").val(),
                     Password: $("#password_input_login").val()
                 }
                 var isChecked = $("#remember_input").is(':checked')
-                
+
                 if (isChecked) {
                     window.localStorage.setItem("login", JSON.stringify(login));
                 }
@@ -282,21 +281,22 @@
                     window.localStorage.setItem("login", null);
                 }
             }
-            function useRememberMe(){
+            function useRememberMe() {
                 let loginFromStorage = JSON.parse(window.localStorage.getItem("login"));
 
-                if(loginFromStorage != null){
-                   $("#email_input_login").val(loginFromStorage.Email);
-                   $("#password_input_login").val(loginFromStorage.Password);
+                if (loginFromStorage != null) {
+                    $("#email_input_login").val(loginFromStorage.Email);
+                    $("#password_input_login").val(loginFromStorage.Password);
                 }
 
             }
-            
+
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
 
-                    $("#imagesList").append(
+                    if (image.Shared){
+                        $("#imagesList").append(
                         $(` 
                                 <div class='imageLayout'>
                                     <div class='imageHeader'>
@@ -312,15 +312,19 @@
                                                 data-toggle="tooltip">
                                         </div>
                                     </div>
-                                    <a href="${image.OriginalURL}" target="_blank">
+                                    <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
+                                        <img class="avatarOnImage" src="${image.AvatarURL}" alt="">
                                         <div    class='image' 
-                                                style="background-image:url('${image.ThumbnailURL}')">
+                                                style="background-image:url('${image.ThumbnailURL}')"
+                                                title="Image de ${image.UserName}" 
+                                                data-toggle="tooltip">
                                         </div>
                                     </a>
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
                     );
+                    }
                 }
                 currentETag = ETag;
                 previousScrollPosition = $(".scrollContainer").scrollTop();
@@ -457,7 +461,7 @@
                 $("#shared_input").prop("checked", true)
                 ImageUploader.resetImage('image');
             }
-            function resetLoginForm(){
+            function resetLoginForm() {
                 $("#email_input_login").val("");
                 $("#password_input_login").val("");
                 $("#remember_input").prop('checked', false);
@@ -603,7 +607,7 @@
             function resetVerifyCodeForm() {
                 $("#verify_code_input").val("");
             }
-            function firstLogin(newUserData){
+            function firstLogin(newUserData) {
                 let login =
                 {
                     Email: newUserData.Email,
@@ -625,10 +629,10 @@
                 let tokenFromStorage = window.localStorage.getItem("token");
                 let tokenFromSession = sessionStorage.getItem("token");
                 let userToken;
-                if (tokenFromSession != null){
+                if (tokenFromSession != null) {
                     userToken = JSON.parse(tokenFromSession);
                 }
-                else if(tokenFromStorage != null){
+                else if (tokenFromStorage != null) {
                     userToken = JSON.parse(tokenFromStorage);
                 }
                 if (userToken != null && userToken != "null") {
@@ -658,11 +662,11 @@
                             let image = imageFromForm();
                             if (image) {
                                 if (createMode) {
-                                    POST(image, user.Access_token, getImagesList, error);
+                                    POST(image, token, getImagesList, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else
-                                    PUT(image, getImagesList, error);
+                                    PUT(image, token, getImagesList, error);
                                 resetimageForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
@@ -696,7 +700,7 @@
                         text: "Login",
                         click: function () {
                             changeLoginToken();
-                               //resetLoginForm();
+                            //resetLoginForm();
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -758,7 +762,7 @@
                         click: function () {
                             holdCheckETag = false;
                             if (imageIdToDelete)
-                                DELETE(imageIdToDelete, getImagesList, error);
+                                DELETE(imageIdToDelete, token, getImagesList, error);
                             imageIdToDelete = 0;
                             $(this).dialog("close");
                         }
@@ -823,11 +827,11 @@
                             if (user) {
                                 if (userCreateMode) {
                                     // TODO, login après et ouvrir dialog
-                                    REGISTER(user, firstLogin , error);
+                                    REGISTER(user, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
-                                else{
-                                    MODIFY_USER(user,token, getImagesList, error);
+                                else {
+                                    MODIFY_USER(user, token, getImagesList, error);
                                     resetUserForm();
                                 }
                                 holdCheckETag = false;

@@ -5,6 +5,8 @@ const ImageFilesRepository = require('./imageFilesRepository.js');
 const UsersRepository = require('./usersRepository');
 const ImageModel = require('./image.js');
 const utilities = require("../utilities");
+const Token = require('./token.js');
+const TokenManager = require('../tokenManager');
 const HttpContext = require('../httpContext').get();
 
 module.exports =
@@ -41,7 +43,8 @@ module.exports =
             return null;
         }
         update(image) {
-            if (this.model.valid(image)) {
+            let foundImage = super.get(image.Id);
+            if (this.model.valid(image) && foundImage && image.UserId == foundImage.UserId) {
                 image["GUID"] = ImageFilesRepository.storeImageData(image["GUID"], image["ImageData"]);
                 delete image["ImageData"];
                 return super.update(image);
@@ -49,8 +52,10 @@ module.exports =
             return false;
         }
         remove(id) {
+            //TODO AJOUTER UNE VÉRIF.
+            let token = TokenManager.find(utilities.getAuthorization(require('../httpContext').get()));
             let foundImage = super.get(id);
-            if (foundImage) {
+            if (token != null && foundImage && foundImage["UserId"] == token["UserId"]) {
                 ImageFilesRepository.removeImageFile(foundImage["GUID"]);
                 return super.remove(id);
             }

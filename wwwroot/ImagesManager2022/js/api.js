@@ -44,22 +44,24 @@ function POST(data, token, successCallBack, errorCallBack) {
         beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
-function PUT(bookmark, successCallBack, errorCallBack) {
+function PUT(bookmark, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + bookmark.Id,
         type: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(bookmark),
         success: () => { successCallBack() },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
-function DELETE(id, successCallBack, errorCallBack) {
+function DELETE(id, token, successCallBack, errorCallBack) {
     $.ajax({
         url: apiBaseURL + "/" + id,
         type: 'DELETE',
         success: () => { successCallBack() },
-        error: function (jqXHR) { errorCallBack(jqXHR.status) }
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
     });
 }
 function TOKEN(data, successCallBack, errorCallBack) {

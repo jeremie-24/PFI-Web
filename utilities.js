@@ -9,6 +9,7 @@
 /////////////////////////////////////////////////////////////////////
 
 const queryStringParser = require('query-string');
+const tokens = require("./data/Tokens.json");
 
 exports.capitalizeFirstLetter = capitalizeFirstLetter;
 function capitalizeFirstLetter(s) {
@@ -23,6 +24,9 @@ exports.deleteByIndex = (array, indexToDelete) => {
     for (let i = indexToDelete.length - 1; i >= 0; i--) {
         array.splice(indexToDelete[i], 1);
     }
+}
+exports.getAuthorization = (httpContext) => {
+    return httpContext.req.headers["authorization"];
 }
 exports.removeQueryString = removeQueryString;
 function removeQueryString(url) {
