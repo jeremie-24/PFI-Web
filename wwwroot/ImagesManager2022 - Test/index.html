@@ -64,9 +64,13 @@
 
             </div>
             <div class="rightHeaderLayout">
+                
+                <div class="loggedDiv">
+                    <span  id="modifyUserCmd"><img id="userImage" src="" alt="Image_user" ></span>
+                    <span id="usernameContainer">Nom</span>
+                </div>
                 <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd"  title="Se connecter"
                     data-toggle="tooltip"></span>
-                <div class="loggedDiv" id="modifyUserCmd"><img id="userImage" src="" alt="Image_user" ></div>
                 <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"  data-toggle="tooltip"></span>
             </div>
         </div>
@@ -231,15 +235,34 @@
             }
 
             function updateUser(data) {
+                if(data == user){
+                    return;
+                }
+
                 user = data;
                 //userToForm(data);
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
+                $("#usernameContainer").html(getUserNameSpan(data));
                 
                 /*
                 let login = getLoginFromUser(data);
                 updateRememberMe(login);
                 */
+            }
+            function isVerified(user){
+                return user.VerifyCode == "verified";
+            }
+            function getUserNameSpan(currentUser){
+                let span = $("<span></span>")
+                span.append(currentUser.Name);
+                if(!isVerified(currentUser)){
+                    span.addClass("unverifiedName");
+                    span.click(() => $("#verifyCodeDlg").dialog('open'));
+                    span.attr("data-toggle", "tooltip");
+                    span.attr("title", "Votre compte n'est pas vérifié. Cliquer sur votre nom pour ouvrir le menu de confirmation de courriel.");
+                }
+                return span;
             }
             function updateRememberMe(login){
                 if(localStorage.hasOwnProperty('login')){
@@ -657,7 +680,7 @@
                     Email: newUserData.Email,
                     Password: $("#password_input").val()
                 }
-
+                resetUserForm();
                 TOKEN(login, changeToken, error);
                 //resetUserForm();
                 $("#verifyCodeDlg").dialog('open');
@@ -791,7 +814,11 @@
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
                             //TODO logout du serveur
+                            resetUserForm();
                             showLoginButtons(false);
+                            user = null;
+                            token = null;
+                            userToken = null;
                             holdCheckETag = false;
                             $(this).dialog("close");
                         }
@@ -884,7 +911,7 @@
 
                             if (FormUser) {
                                 if (userCreateMode) {
-                                    REGISTER(user, firstLogin, error);
+                                    REGISTER(FormUser, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else {
@@ -949,7 +976,7 @@
             }
         </script>
 
-        <!--           //TODO modifierUser, empecher image si pas verified-->
+        <!--           //TODO delete user dans modify, empecher image si pas verified-->
 </body>
 
 </html>
