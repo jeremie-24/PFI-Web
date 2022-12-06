@@ -318,15 +318,11 @@
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
                     var imageUrl = image.AvatarURL;
+                    var header = "";
+                    
                     if (user && user["Id"] &&image.UserId == user.Id){
                         imageUrl = "images/shared.png";
-                    }
-                    if (image.Shared) {
-                        $("#imagesList").append(
-                            $(` 
-                                <div class='imageLayout'>
-                                    <div class='imageHeader'>
-                                        <div class="imageTitle">${image.Title}</div>
+                        header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
                                                 imageid="${image.Id}" 
                                                 title="Editer ${image.Title}" 
@@ -336,7 +332,16 @@
                                                 imageid="${image.Id}" 
                                                 title="Effacer ${image.Title}" 
                                                 data-toggle="tooltip">
-                                        </div>
+                                        </div>`
+                    }
+
+                    if (image.Shared) {
+                        $("#imagesList").append(
+                            $(` 
+                                <div class='imageLayout'>
+                                    <div class='imageHeader'>
+                                        <div class="imageTitle">${image.Title}</div>
+                                    ${header}
                                     </div>
                                     <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
                                         <img class="avatarOnImage" src="${imageUrl}" alt="">
