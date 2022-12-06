@@ -198,6 +198,7 @@
             let appendMode = false;
             let token;
             let user;
+            let userToken;
 
             let userCreateMode = true;
 
@@ -231,11 +232,36 @@
 
             function updateUser(data) {
                 user = data;
-                userToForm(data);
+                //userToForm(data);
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
+                
+                /*
+                let login = getLoginFromUser(data);
+                updateRememberMe(login);
+                */
             }
+            function updateRememberMe(login){
+                if(localStorage.hasOwnProperty('login')){
+                    let newLogin = JSON.parse(window.localStorage.getItem("login"));
+                    if(login.Password){
+                        newLogin.Password = login.Password;
+                    }
+                    if(login.Email){
+                        newLogin.Email = login.Email;
+                    }
+                    window.localStorage.setItem(loginLocalStorageName, JSON.stringify(newLogin));
+                }
+            }
+            function getLoginFromUser(user){
+                let login =
+                {
+                    Email: user.Email,
+                    Password: user.Password
+                }
+                return login;
 
+            }
             function getUser(token) {
                 GETUSER(token, updateUser, error);
             }
@@ -252,6 +278,7 @@
             }
 
             function changeToken(newToken) {
+                userToken =newToken;
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
 
@@ -472,24 +499,6 @@
                 $("#password_input_login").val("");
                 $("#remember_input").prop('checked', false);
             }
-            function imageFromForm() {
-                if ($("#imageForm")[0].checkValidity()) {
-                    let image = {
-                        Id: parseInt($("#Id_input").val()),
-                        GUID: $("#GUID_input").val(),
-                        Title: $("#title_input").val(),
-                        Description: $("#description_input").val(),
-                        ImageData: ImageUploader.getImageData('image'),
-                        Date: parseInt($("#date_input").val()),
-                        UserId: JSON.parse(sessionStorage.getItem("token")).UserId,
-                        Shared: $("#shared_input").prop("checked")
-                    };
-                    return image;
-                } else {
-                    $("#imageForm")[0].reportValidity()
-                }
-                return false;
-            }
 
 
             function editimage(e) {
@@ -567,13 +576,26 @@
             function modifyUser() {
                 holdCheckETag = true;
                 userCreateMode = false;
+                userToForm(user);
                 ImageUploader.imageRequired('avatar', false);
+                //TODO régler problème: quand on efface le mot de passe, il est required
                 $("#password_input").prop('required',false);
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
                 $("#userDlg").dialog('open');
             }
+            function updateAfterModify(modifiedUser){
 
+                if(modifiedUser.Email != user.Email){
+                    $("#verifyCodeDlg").dialog('open');
+                }
+                updateUser(modifiedUser);
+
+                let login = getLoginFromUser(modifiedUser);
+                updateRememberMe(login);
+
+                getImagesList();
+            }
 
             function userToForm(user) {
 
@@ -597,7 +619,7 @@
                     };
                     return user;
                 } else {
-                    $("#imageForm")[0].reportValidity()
+                    $("#userForm")[0].reportValidity()
                 }
                 return false;
             }
@@ -643,7 +665,7 @@
 
             function initToken() {
                 let tokenFromSession = sessionStorage.getItem("token");
-                let userToken;
+                //let userToken;
                 if (tokenFromSession != null) {
                     userToken = JSON.parse(tokenFromSession);
                     if (userToken != null) {
@@ -858,15 +880,15 @@
                         text: "Title will be changed dynamically",
                         click: function () {
 
-                            let user = userFromForm();
+                            let FormUser = userFromForm();
 
-                            if (user) {
+                            if (FormUser) {
                                 if (userCreateMode) {
                                     REGISTER(user, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else {
-                                    MODIFY_USER(user, token, getImagesList, error);
+                                    MODIFY_USER(FormUser, token, (data) => updateAfterModify(FormUser), error);
                                     resetUserForm();
                                 }
                                 holdCheckETag = false;
@@ -905,7 +927,7 @@
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
 
-                                VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
+                                VERIFY((data) => getUser(userToken), error, verifyCode.Id, verifyCode.code);
 
 
 

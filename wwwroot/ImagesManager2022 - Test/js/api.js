@@ -76,13 +76,13 @@ function TOKEN(data, successCallBack, errorCallBack) {
     });
 }
 
-function GETUSER(data, successCallBack, errorCallBack) {
+function GETUSER(token, successCallBack, errorCallBack) {
     $.ajax({
-        url: accountsGet + data.UserId,
+        url: accountsGet + token.UserId,
         type: 'GET',
         success: (data) => { successCallBack(data) },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
-        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', data.Access_token ); }
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token.Access_token ); }
     });
 }
 
