@@ -46,8 +46,9 @@ module.exports =
             return false;
         }
         remove(id) {
+            let token = utilities.getToken(require('../httpContext').get());
             let foundUser = super.get(id);
-            if (foundUser) {
+            if (foundUser && token != null && foundUser && id == token["UserId"]) {
                 ImageFilesRepository.removeImageFile(foundUser["AvatarGUID"]);
                 return super.remove(id);
             }
