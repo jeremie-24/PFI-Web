@@ -106,7 +106,7 @@ body {
     overflow-y: scroll;
     flex: 1;
     border-top: 1px solid lightgray;
-    scroll-snap-type: y mandatory;
+    /*scroll-snap-type: y mandatory;*/
 }
 ::-webkit-scrollbar {
     width: 18px;

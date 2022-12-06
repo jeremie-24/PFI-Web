@@ -814,6 +814,7 @@
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
                             //TODO logout du serveur
+                            LOGOUT(user.Id, () => console.log("Déconnexion"), error);
                             resetUserForm();
                             showLoginButtons(false);
                             user = null;

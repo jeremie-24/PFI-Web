@@ -6,6 +6,7 @@ const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
 const userModifyUrl = accountsApiUrl + "/modify";
+const userLogoutUrl = accountsApiUrl + "/logout";
 const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
@@ -116,5 +117,14 @@ function MODIFY_USER(user, accessToken, successCallBack, errorCallBack){
         success: () => { successCallBack() },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
         beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', accessToken ); }
+    });
+}
+
+function LOGOUT(userId,successCallBack, errorCallBack) {
+    $.ajax({
+        url: userLogoutUrl + "/" + userId,
+        type: 'GET',
+        success: () => { successCallBack() },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
