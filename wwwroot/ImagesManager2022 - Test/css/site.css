@@ -24,11 +24,21 @@ body {
     grid-template-columns: 80px auto 60px 60px  ;
     align-items: center;
 }
+.imageContainer {
+    position: relative;
+    
+}
 .rightHeaderLayout{
     display: grid;
     grid-template-columns: 60px auto 60px;
     align-self: right;
     align-items: center;
+}
+.avatarOnImage {
+    position: absolute;
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
 }
 /*
 #logoutCmd {
