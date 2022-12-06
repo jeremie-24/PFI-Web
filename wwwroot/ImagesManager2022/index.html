@@ -317,7 +317,10 @@
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
-
+                    var imageUrl = image.AvatarURL;
+                    if (user && user["Id"] &&image.UserId == user.Id){
+                        imageUrl = "images/shared.png";
+                    }
                     if (image.Shared) {
                         $("#imagesList").append(
                             $(` 
@@ -336,7 +339,7 @@
                                         </div>
                                     </div>
                                     <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
-                                        <img class="avatarOnImage" src="${image.AvatarURL}" alt="">
+                                        <img class="avatarOnImage" src="${imageUrl}" alt="">
                                         <div    class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
                                                 title="Image de ${image.UserName}" 
