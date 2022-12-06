@@ -22,7 +22,10 @@
     <div class="mainContainer">
         <div class="headerPanel">
             <div class="headerLayout">
-                <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon" title="Gestionnaire d'images">
+                <div class="creditDiv" id="creditCmd" title="À propos"
+                    data-toggle="tooltip">
+                    <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon" title="Gestionnaire d'images">
+                </div>
                 <div style="display:flex">
                     <span class="header outLinedText tbg-yellow">
                         P
@@ -55,6 +58,7 @@
                         D
                     </span>
                 </div>
+                
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
@@ -171,6 +175,11 @@
                 </div>
                 <div id="errorDlg">
                     <span id="errorMessage"></span>
+                </div>
+
+                <div id="creditDlg">
+                    <div>Jérémie Couturier</div>
+                    <div>Marc-Antoine Duquette</div>
                 </div>
             </div>
         </div>
@@ -399,6 +408,11 @@
                 $("#imageDlg").dialog('option', 'title', "Ajout d'image");
                 $("#imageDlgOkBtn").text("Ajouter");
                 $("#imageDlg").dialog('open');
+            }
+            function credits() {
+                holdCheckETag = true;
+                $("#creditDlg").dialog('option', 'title', 'À propos');
+                $("#creditDlg").dialog('open');
             }
             function logout() {
                 holdCheckETag = true;
@@ -669,6 +683,7 @@
                 $("#modifyUserCmd").click(newUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
+                $("#creditCmd").click(credits);
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
@@ -745,6 +760,28 @@
                         }
                     }]
                 });
+
+                $("#creditDlg").dialog({
+                    title: "...",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 640,
+                    minWidth: 640,
+                    maxWidth: 640,
+                    height: 200,
+                    minHeight: 200,
+                    maxHeight: 200,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        text: "Fermer",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
+                })
 
                 $("#logoutDlg").dialog({
                     title: "...",

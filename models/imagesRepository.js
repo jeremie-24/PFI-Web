@@ -52,7 +52,6 @@ module.exports =
             return false;
         }
         remove(id) {
-            //TODO AJOUTER UNE VÉRIF.
             let token = utilities.getToken(require('../httpContext').get());
             let foundImage = super.get(id);
             if (token != null && foundImage && foundImage["UserId"] == token["UserId"]) {
