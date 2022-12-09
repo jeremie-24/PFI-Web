@@ -370,7 +370,9 @@
                     var imageUrl = image.AvatarURL;
                     var header = "";
 
-                    if (user && user["Id"] && image.UserId == user.Id) {
+                    var isOwned = user && user["Id"] && image.UserId == user.Id
+
+                    if (isOwned) {
                         imageUrl = "images/shared.png";
                         header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
@@ -385,7 +387,7 @@
                                         </div>`
                     }
 
-                    if (image.Shared) {
+                    if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
                                 <div class='imageLayout'>
