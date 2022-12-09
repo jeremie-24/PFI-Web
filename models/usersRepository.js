@@ -2,6 +2,7 @@ const ImageFilesRepository = require('./imageFilesRepository.js');
 const UserModel = require('./user.js');
 const utilities = require("../utilities");
 const HttpContext = require('../httpContext').get();
+const ImagesRepository = require("./imageFilesRepository");
 
 module.exports =
     class UsersRepository extends require('./repository') {
@@ -49,6 +50,14 @@ module.exports =
             let token = utilities.getToken(require('../httpContext').get());
             let foundUser = super.get(id);
             if (foundUser && token != null && foundUser && id == token["UserId"]) {
+
+                //TODO supprimer les images aussi
+                var images = require("../data/Images.json");
+                images.forEach(element => {
+                    if (element.UserId == id){
+                        ImagesRepository.remove(id);
+                    }
+                });
                 ImageFilesRepository.removeImageFile(foundUser["AvatarGUID"]);
                 return super.remove(id);
             }
