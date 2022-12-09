@@ -84,7 +84,7 @@
 
         <div id="searchBar">
             <div class="searchBarLayout">
-                <select id="searchCategory" class="form-control searchInput">
+                <select id="searchUserName" class="form-control searchInput">
                     <!-- filled programmatically-->
                 </select>
                 <span>
@@ -95,7 +95,7 @@
                 <span>
                     <!-- skip a column -->
                 </span>
-                <span class="cmd fa fa-refresh"></span>
+                <span id="RefreshCmd" class="cmd fa fa-refresh"></span>
             </div>
         </div>
 
@@ -250,11 +250,11 @@
             let holdCheckETag = false;
             let currentETag = "";
             let createMode = true;
-            let searchCategory = "";
+            let searchUserName = "";
             let searchTitle = "";
             let hideSearchBar = true;
             let imageIdToDelete = 0; // used by confirmDeleteDlg
-            let selectedCategory = "";
+            let selectedUserName = "";
             let imagesCount = 50;
             let appendCount = 3;
             let previousScrollPosition = 0;
@@ -262,6 +262,7 @@
             let token;
             let user;
             let userToken;
+            let searchBarIsShown = false;
 
             let userCreateMode = true;
 
@@ -280,6 +281,7 @@
 
             function getImagesList(refresh = true) {
                 appendMode = !refresh;
+                
                 function prepareQueryString() {
                     let queryString = "";
                     if (appendMode) {
@@ -287,6 +289,13 @@
                         imagesCount += appendCount;
                     } else {
                         queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
+                    }
+                    if (searchBarIsShown) {
+                        selectedUserId = $("#searchUserName").val();
+                        let searchTitle = $("#searchTitle").val();
+                        if (selectedUserId != "")
+                            queryString += "&UserId=" + selectedUserId;
+                            //TODO ajouter les keywords
                     }
                     return queryString;
                 }
@@ -369,7 +378,7 @@
                 /*
                 var isChecked = $("#remember_input").prop('checked');
                 sessionStorage.setItem("token", JSON.stringify(newToken));
-                if (isChecked) {
+                if (ihoChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
@@ -821,15 +830,18 @@
 
             }
 
-            var searchBarIsShown = false;
-
             function DisplayUserNames(names){
                 for (let name of names) {
-                    $("#searchCategory").append(`<option>${name.UserName}</option>`);
+                    $("#searchUserName").append(`<option value=${name.UserId}>${name.UserName}</option>`);
                 }
+            }
+
+            function ClearUserNames(){
+                $("#searchUserName").empty();
             }
             
             function ToggleSearchBar(){
+                ClearUserNames();
                 GETUSERNAMES(DisplayUserNames, error);
                 if (searchBarIsShown){
                     $("#searchBar").hide();
@@ -850,6 +862,7 @@
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
                 $("#creditCmd").click(credits);
+                $("#RefreshCmd").click(e => {getImagesList(true)});
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
