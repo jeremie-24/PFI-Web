@@ -6,6 +6,7 @@ const accountsApiUrl = host + "/accounts";
 const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
 const userModifyUrl = accountsApiUrl + "/modify";
+const userLogoutUrl = accountsApiUrl + "/logout";
 const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
@@ -76,15 +77,16 @@ function TOKEN(data, successCallBack, errorCallBack) {
     });
 }
 
-function GETUSER(data, successCallBack, errorCallBack) {
+function GETUSER(token, successCallBack, errorCallBack) {
     $.ajax({
-        url: accountsGet + data.UserId,
+        url: accountsGet + token.UserId,
         type: 'GET',
         success: (data) => { successCallBack(data) },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
-        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', data.Access_token ); }
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token.Access_token ); }
     });
 }
+
 
 function REGISTER(data, successCallBack, errorCallBack) {
     $.ajax({
@@ -96,6 +98,7 @@ function REGISTER(data, successCallBack, errorCallBack) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
+
 function VERIFY(successCallBack, errorCallBack, id, code) {
     let url = verifyUrl + `?id=${id}&code=${code}`;
     $.ajax({
@@ -115,6 +118,15 @@ function MODIFY_USER(user, accessToken, successCallBack, errorCallBack){
         success: () => { successCallBack() },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
         beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', accessToken ); }
+    });
+}
+
+function LOGOUT(userId,successCallBack, errorCallBack) {
+    $.ajax({
+        url: userLogoutUrl + "/" + userId,
+        type: 'GET',
+        success: () => { successCallBack() },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
 

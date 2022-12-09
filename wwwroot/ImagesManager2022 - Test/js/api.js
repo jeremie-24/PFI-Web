@@ -128,3 +128,13 @@ function LOGOUT(userId,successCallBack, errorCallBack) {
         error: function (jqXHR) { errorCallBack(jqXHR.status) }
     });
 }
+
+function DELETE_USER(id, token, successCallBack, errorCallBack) {
+    $.ajax({
+        url: accountsApiUrl + "/" + id,
+        type: 'GET',
+        success: () => { successCallBack() },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+        beforeSend: function(xhr) { xhr.setRequestHeader('Authorization', token ); }
+    });
+}

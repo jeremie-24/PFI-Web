@@ -22,9 +22,9 @@
     <div class="mainContainer">
         <div class="headerPanel">
             <div class="headerLayout">
-                <div class="creditDiv" id="creditCmd" title="À propos"
-                    data-toggle="tooltip">
-                    <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon" title="Gestionnaire d'images">
+                <div class="creditDiv" id="creditCmd" title="À propos" data-toggle="tooltip">
+                    <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon"
+                        title="Gestionnaire d'images">
                 </div>
                 <div style="display:flex">
                     <span class="header outLinedText tbg-yellow">
@@ -58,7 +58,7 @@
                         D
                     </span>
                 </div>
-                
+
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
@@ -69,9 +69,13 @@
 
             </div>
             <div class="rightHeaderLayout">
+
+                <div class="loggedDiv">
+                    <span id="modifyUserCmd"><img id="userImage" src="" alt="Image_user"></span>
+                    <span id="usernameContainer">Nom</span>
+                </div>
                 <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd" title="Se connecter"
                     data-toggle="tooltip"></span>
-                <div class="loggedDiv" id="modifyUserCmd"><img id="userImage" src="" alt="Image_user"></div>
                 <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
                     data-toggle="tooltip"></span>
             </div>
@@ -209,6 +213,7 @@
             let appendMode = false;
             let token;
             let user;
+            let userToken;
 
             let userCreateMode = true;
 
@@ -241,12 +246,56 @@
             }
 
             function updateUser(data) {
+                if (data == user) {
+                    return;
+                }
+
                 user = data;
-                userToForm(data);
+                //userToForm(data);
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
-            }
+                $("#usernameContainer").html(getUserNameSpan(data));
 
+                /*
+                let login = getLoginFromUser(data);
+                updateRememberMe(login);
+                */
+            }
+            function isVerified(user) {
+                return user.VerifyCode == "verified";
+            }
+            function getUserNameSpan(currentUser) {
+                let span = $("<span></span>")
+                span.append(currentUser.Name);
+                if (!isVerified(currentUser)) {
+                    span.addClass("unverifiedName");
+                    span.click(() => $("#verifyCodeDlg").dialog('open'));
+                    span.attr("data-toggle", "tooltip");
+                    span.attr("title", "Votre compte n'est pas vérifié. Cliquer sur votre nom pour ouvrir le menu de confirmation de courriel.");
+                }
+                return span;
+            }
+            function updateRememberMe(login) {
+                if (localStorage.hasOwnProperty('login')) {
+                    let newLogin = JSON.parse(window.localStorage.getItem("login"));
+                    if (login.Password) {
+                        newLogin.Password = login.Password;
+                    }
+                    if (login.Email) {
+                        newLogin.Email = login.Email;
+                    }
+                    window.localStorage.setItem(loginLocalStorageName, JSON.stringify(newLogin));
+                }
+            }
+            function getLoginFromUser(user) {
+                let login =
+                {
+                    Email: user.Email,
+                    Password: user.Password
+                }
+                return login;
+
+            }
             function getUser(token) {
                 GETUSER(token, updateUser, error);
             }
@@ -263,6 +312,7 @@
             }
 
             function changeToken(newToken) {
+                userToken = newToken;
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
 
@@ -319,8 +369,8 @@
                 function insertIntoImageList(image) {
                     var imageUrl = image.AvatarURL;
                     var header = "";
-                    
-                    if (user && user["Id"] &&image.UserId == user.Id){
+
+                    if (user && user["Id"] && image.UserId == user.Id) {
                         imageUrl = "images/shared.png";
                         header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
@@ -583,7 +633,7 @@
                 holdCheckETag = true;
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
-                $("#password_input").prop('required',true);
+                $("#password_input").prop('required', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
@@ -591,12 +641,27 @@
             function modifyUser() {
                 holdCheckETag = true;
                 userCreateMode = false;
+                userToForm(user);
                 ImageUploader.imageRequired('avatar', false);
-                $("#password_input").prop('required',false);
+                //TODO régler problème: quand on efface le mot de passe, il est required
+                $("#password_input").prop('required', false);
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
                 $("#userDlg").dialog('open');
             }
+            function updateAfterModify(modifiedUser) {
+
+                if (modifiedUser.Email != user.Email) {
+                    $("#verifyCodeDlg").dialog('open');
+                }
+                updateUser(modifiedUser);
+
+                let login = getLoginFromUser(modifiedUser);
+                updateRememberMe(login);
+
+                getImagesList();
+            }
+
 
             function userToForm(user) {
 
@@ -607,6 +672,7 @@
 
                 ImageUploader.setImage('avatar', user.AvatarURL);
             }
+
             function userFromForm() {
                 if ($("#userForm")[0].checkValidity()) {
                     let user = {
@@ -619,7 +685,7 @@
                     };
                     return user;
                 } else {
-                    $("#imageForm")[0].reportValidity()
+                    $("#userForm")[0].reportValidity()
                 }
                 return false;
             }
@@ -657,6 +723,7 @@
                     Email: newUserData.Email,
                     Password: $("#password_input").val()
                 }
+                resetUserForm();
 
                 TOKEN(login, changeToken, error);
                 //resetUserForm();
@@ -665,7 +732,7 @@
 
             function initToken() {
                 let tokenFromSession = sessionStorage.getItem("token");
-                let userToken;
+                //let userToken;
                 if (tokenFromSession != null) {
                     userToken = JSON.parse(tokenFromSession);
                     if (userToken != null) {
@@ -688,14 +755,14 @@
             function init_UI() {
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
-                $("#modifyUserCmd").click(newUser);
+                $("#modifyUserCmd").click(modifyUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
                 $("#creditCmd").click(credits);
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
-                  //useRememberMe();
+                //useRememberMe();
 
                 // Images
                 $("#imageDlg").dialog({
@@ -811,8 +878,13 @@
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
-                            //TODO logout du serveur
+
+                            LOGOUT(user.Id, () => console.log("Déconnexion"), error);
+                            resetUserForm();
                             showLoginButtons(false);
+                            user = null;
+                            token = null;
+                            userToken = null;
                             holdCheckETag = false;
                             $(this).dialog("close");
                         }
@@ -901,15 +973,15 @@
                         text: "Title will be changed dynamically",
                         click: function () {
 
-                            let user = userFromForm();
+                            let FormUser = userFromForm();
 
-                            if (user) {
+                            if (FormUser) {
                                 if (userCreateMode) {
-                                    REGISTER(user, firstLogin, error);
+                                    REGISTER(FormUser, firstLogin, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else {
-                                    MODIFY_USER(user, token, getImagesList, error);
+                                    MODIFY_USER(FormUser, token, (data) => updateAfterModify(FormUser), error);
                                     resetUserForm();
                                 }
                                 holdCheckETag = false;
@@ -947,8 +1019,8 @@
 
                             let verifyCode = verifyCodeFromForm();
                             if (verifyCode) {
-                                
-                                VERIFY(updateUser(token), error, verifyCode.Id, verifyCode.code);
+
+                                VERIFY((data) => getUser(userToken), error, verifyCode.Id, verifyCode.code);
 
 
 

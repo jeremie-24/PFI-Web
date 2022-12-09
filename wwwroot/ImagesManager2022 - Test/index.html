@@ -22,7 +22,10 @@
     <div class="mainContainer">
         <div class="headerPanel">
             <div class="headerLayout">
-                <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon" title="Gestionnaire d'images">
+                <div class="creditDiv" id="creditCmd" title="À propos" data-toggle="tooltip">
+                    <img src="images/camera.png" alt="" data-toggle="tooltip" class="favicon"
+                        title="Gestionnaire d'images">
+                </div>
                 <div style="display:flex">
                     <span class="header outLinedText tbg-yellow">
                         P
@@ -55,23 +58,26 @@
                         D
                     </span>
                 </div>
+
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd"  title="Créer un compte" data-toggle="tooltip"></span>
+                <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
+                    data-toggle="tooltip"></span>
 
 
 
 
             </div>
             <div class="rightHeaderLayout">
-                
+
                 <div class="loggedDiv">
-                    <span  id="modifyUserCmd"><img id="userImage" src="" alt="Image_user" ></span>
+                    <span id="modifyUserCmd"><img id="userImage" src="" alt="Image_user"></span>
                     <span id="usernameContainer">Nom</span>
                 </div>
-                <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd"  title="Se connecter"
+                <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd" title="Se connecter"
                     data-toggle="tooltip"></span>
-                <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"  data-toggle="tooltip"></span>
+                <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
+                    data-toggle="tooltip"></span>
             </div>
         </div>
 
@@ -174,6 +180,11 @@
                 <div id="errorDlg">
                     <span id="errorMessage"></span>
                 </div>
+
+                <div id="creditDlg">
+                    <div>Jérémie Couturier</div>
+                    <div>Marc-Antoine Duquette</div>
+                </div>
             </div>
         </div>
 
@@ -235,7 +246,7 @@
             }
 
             function updateUser(data) {
-                if(data == user){
+                if (data == user) {
                     return;
                 }
 
@@ -244,19 +255,19 @@
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
                 $("#usernameContainer").html(getUserNameSpan(data));
-                
+
                 /*
                 let login = getLoginFromUser(data);
                 updateRememberMe(login);
                 */
             }
-            function isVerified(user){
+            function isVerified(user) {
                 return user.VerifyCode == "verified";
             }
-            function getUserNameSpan(currentUser){
+            function getUserNameSpan(currentUser) {
                 let span = $("<span></span>")
                 span.append(currentUser.Name);
-                if(!isVerified(currentUser)){
+                if (!isVerified(currentUser)) {
                     span.addClass("unverifiedName");
                     span.click(() => $("#verifyCodeDlg").dialog('open'));
                     span.attr("data-toggle", "tooltip");
@@ -264,19 +275,19 @@
                 }
                 return span;
             }
-            function updateRememberMe(login){
-                if(localStorage.hasOwnProperty('login')){
+            function updateRememberMe(login) {
+                if (localStorage.hasOwnProperty('login')) {
                     let newLogin = JSON.parse(window.localStorage.getItem("login"));
-                    if(login.Password){
+                    if (login.Password) {
                         newLogin.Password = login.Password;
                     }
-                    if(login.Email){
+                    if (login.Email) {
                         newLogin.Email = login.Email;
                     }
                     window.localStorage.setItem(loginLocalStorageName, JSON.stringify(newLogin));
                 }
             }
-            function getLoginFromUser(user){
+            function getLoginFromUser(user) {
                 let login =
                 {
                     Email: user.Email,
@@ -301,7 +312,7 @@
             }
 
             function changeToken(newToken) {
-                userToken =newToken;
+                userToken = newToken;
                 token = newToken.Access_token;
                 //$("#loginDlg").dialog("close");
 
@@ -356,13 +367,12 @@
 
             function refreshimagesList(images, ETag) {
                 function insertIntoImageList(image) {
+                    var imageUrl = image.AvatarURL;
+                    var header = "";
 
-                    if (image.Shared){
-                        $("#imagesList").append(
-                        $(` 
-                                <div class='imageLayout'>
-                                    <div class='imageHeader'>
-                                        <div class="imageTitle">${image.Title}</div>
+                    if (user && user["Id"] && image.UserId == user.Id) {
+                        imageUrl = "images/shared.png";
+                        header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
                                                 imageid="${image.Id}" 
                                                 title="Editer ${image.Title}" 
@@ -372,10 +382,19 @@
                                                 imageid="${image.Id}" 
                                                 title="Effacer ${image.Title}" 
                                                 data-toggle="tooltip">
-                                        </div>
+                                        </div>`
+                    }
+
+                    if (image.Shared) {
+                        $("#imagesList").append(
+                            $(` 
+                                <div class='imageLayout'>
+                                    <div class='imageHeader'>
+                                        <div class="imageTitle">${image.Title}</div>
+                                    ${header}
                                     </div>
                                     <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
-                                        <img class="avatarOnImage" src="${image.AvatarURL}" alt="">
+                                        <img class="avatarOnImage" src="${imageUrl}" alt="">
                                         <div    class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
                                                 title="Image de ${image.UserName}" 
@@ -385,7 +404,7 @@
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
-                    );
+                        );
                     }
                 }
                 currentETag = ETag;
@@ -447,6 +466,11 @@
                 $("#imageDlg").dialog('option', 'title', "Ajout d'image");
                 $("#imageDlgOkBtn").text("Ajouter");
                 $("#imageDlg").dialog('open');
+            }
+            function credits() {
+                holdCheckETag = true;
+                $("#creditDlg").dialog('option', 'title', 'À propos');
+                $("#creditDlg").dialog('open');
             }
             function logout() {
                 holdCheckETag = true;
@@ -522,6 +546,24 @@
                 $("#password_input_login").val("");
                 $("#remember_input").prop('checked', false);
             }
+            function imageFromForm() {
+                if ($("#imageForm")[0].checkValidity()) {
+                    let image = {
+                        Id: parseInt($("#Id_input").val()),
+                        GUID: $("#GUID_input").val(),
+                        Title: $("#title_input").val(),
+                        Description: $("#description_input").val(),
+                        ImageData: ImageUploader.getImageData('image'),
+                        Date: parseInt($("#date_input").val()),
+                        UserId: JSON.parse(sessionStorage.getItem("token")).UserId,
+                        Shared: $("#shared_input").prop("checked")
+                    };
+                    return image;
+                } else {
+                    $("#imageForm")[0].reportValidity()
+                }
+                return false;
+            }
 
 
             function editimage(e) {
@@ -591,7 +633,7 @@
                 holdCheckETag = true;
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
-                $("#password_input").prop('required',true);
+                $("#password_input").prop('required', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
@@ -602,14 +644,14 @@
                 userToForm(user);
                 ImageUploader.imageRequired('avatar', false);
                 //TODO régler problème: quand on efface le mot de passe, il est required
-                $("#password_input").prop('required',false);
+                $("#password_input").prop('required', false);
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
                 $("#userDlg").dialog('open');
             }
-            function updateAfterModify(modifiedUser){
+            function updateAfterModify(modifiedUser) {
 
-                if(modifiedUser.Email != user.Email){
+                if (modifiedUser.Email != user.Email) {
                     $("#verifyCodeDlg").dialog('open');
                 }
                 updateUser(modifiedUser);
@@ -619,6 +661,7 @@
 
                 getImagesList();
             }
+
 
             function userToForm(user) {
 
@@ -714,6 +757,7 @@
                 $("#modifyUserCmd").click(modifyUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
+                $("#creditCmd").click(credits);
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
@@ -727,7 +771,7 @@
                     autoOpen: false,
                     modal: true,
                     show: { effect: 'fade', speed: 400 },
-                    hide: { effshowLoginButtonsect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
                     width: 640,
                     minWidth: 640,
                     maxWidth: 640,
@@ -742,11 +786,11 @@
                             let image = imageFromForm();
                             if (image) {
                                 if (createMode) {
-                                    POST(image, getImagesList, error);
+                                    POST(image, token, getImagesList, error);
                                     $(".scrollContainer").scrollTop(0);
                                 }
                                 else
-                                    PUT(image, getImagesList, error);
+                                    PUT(image, token, getImagesList, error);
                                 resetimageForm();
                                 holdCheckETag = false;
                                 $(this).dialog("close");
@@ -793,6 +837,28 @@
                     }]
                 });
 
+                $("#creditDlg").dialog({
+                    title: "...",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 640,
+                    minWidth: 640,
+                    maxWidth: 640,
+                    height: 200,
+                    minHeight: 200,
+                    maxHeight: 200,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        text: "Fermer",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
+                })
+
                 $("#logoutDlg").dialog({
                     title: "...",
                     autoOpen: false,
@@ -813,7 +879,7 @@
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
-                            //TODO logout du serveur
+
                             LOGOUT(user.Id, () => console.log("Déconnexion"), error);
                             resetUserForm();
                             showLoginButtons(false);
@@ -848,7 +914,7 @@
                         click: function () {
                             holdCheckETag = false;
                             if (imageIdToDelete)
-                            DELETE(imageIdToDelete, token, getImagesList, error);
+                                DELETE(imageIdToDelete, token, getImagesList, error);
                             imageIdToDelete = 0;
                             $(this).dialog("close");
                         }
