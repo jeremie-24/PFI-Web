@@ -10,7 +10,7 @@
 
 const queryStringParser = require('query-string');
 const tokens = require("./data/Tokens.json");
-const TokenManager = require("./tokenManager");
+
 
 exports.capitalizeFirstLetter = capitalizeFirstLetter;
 function capitalizeFirstLetter(s) {
@@ -30,7 +30,7 @@ exports.getAuthorization = (httpContext) => {
     return httpContext.req.headers["authorization"];
 }
 exports.getToken = (httpContext) => {
-    return TokenManager.find(exports.getAuthorization(httpContext));
+    return require("./tokenManager").find(exports.getAuthorization(httpContext));
 }
 exports.removeQueryString = removeQueryString;
 function removeQueryString(url) {
