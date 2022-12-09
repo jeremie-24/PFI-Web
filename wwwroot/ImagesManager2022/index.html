@@ -259,6 +259,7 @@
             let hideSearchBar = true;
             let imageIdToDelete = 0; // used by confirmDeleteDlg
             let selectedUserName = "";
+            let selectedUserId = "";
             let imagesCount = 50;
             let appendCount = 3;
             let previousScrollPosition = 0;
@@ -286,6 +287,7 @@
 
             function getImagesList(refresh = true) {
                 appendMode = !refresh;
+                GETUSERNAMES(DisplayUserNames, error);
 
                 function prepareQueryString() {
                     let queryString = "";
@@ -310,7 +312,7 @@
                     return queryString;
                 }
                 GET_ALL(refreshimagesList, error, prepareQueryString());
-                GETUSERNAMES(DisplayUserNames, error);
+                //GETUSERNAMES(DisplayUserNames, error);
             }
             function updateLocalStorageKeywords(newKeywords){
                 let keywords =[];
@@ -900,13 +902,24 @@
             function DisplayUserNames(names){
                 ClearUserNames();
                 $("#searchUserName").append(`<option value="">Toutes les images</option>`);
+                
+                
                 if (user && user["Id"]){
-                    $("#searchUserName").append(`<option value=${user.Id}>Mes images</option>`);
+                    let selected ="";
+                    if(user.Id == selectedUserId){
+                        selected = "selected"; 
+                    }
+
+                    $("#searchUserName").append(`<option value=${user.Id} ${selected}>Mes images</option>`);
                 }
                 
                 for (let name of names) {
+                    let selected ="";
+                    if(name.UserId == selectedUserId){
+                        selected = "selected"; 
+                    }
                     if (!user || name.UserId != user.Id){
-                        $("#searchUserName").append(`<option value=${name.UserId}>${name.UserName}</option>`);
+                        $("#searchUserName").append(`<option value=${name.UserId} ${selected}>${name.UserName}</option>`);
                     }
                 }
             }
