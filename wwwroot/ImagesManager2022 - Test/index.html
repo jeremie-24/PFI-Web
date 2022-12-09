@@ -91,8 +91,8 @@
                 <span>
                     <!-- skip a column -->
                 </span>
-                <input type="search" id="searchTitle" class="form-control searchInput"
-                    placeholder="Recherche de nouvelles" />
+                <input type="search" id="keywordSearch" class="form-control searchInput"
+                    placeholder="Recherche par mots-clés" />
                 <span>
                     <!-- skip a column -->
                 </span>
@@ -254,7 +254,7 @@
             let currentETag = "";
             let createMode = true;
             let searchUserName = "";
-            let searchTitle = "";
+            let keywordSearch = "";
             let hideSearchBar = true;
             let imageIdToDelete = 0; // used by confirmDeleteDlg
             let selectedUserName = "";
@@ -294,10 +294,12 @@
                     }
                     if (searchBarIsShown) {
                         selectedUserId = $("#searchUserName").val();
-                        let searchTitle = $("#searchTitle").val();
+                        let keywordSearch = $("#keywordSearch").val();
                         if (selectedUserId != "")
                             queryString += "&UserId=" + selectedUserId;
-                            //TODO ajouter les keywords
+                        if(keywordSearch != ""){
+                            queryString+= "&keywords=" + keywordSearch;
+                        }
                     }
                     return queryString;
                 }
