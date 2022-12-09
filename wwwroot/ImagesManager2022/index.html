@@ -92,9 +92,12 @@
                 <span>
                     <!-- skip a column -->
                 </span>
-                <input type="search" id="keywordSearch" class="form-control searchInput"
+                <input type="search" id="keywordSearch" class="form-control searchInput" list="keywordsData"
                     placeholder="Recherche par mots-clés" />
                 <span>
+                    <datalist id="keywordsData">
+                        
+                    </datalist>
                     <!-- skip a column -->
                 </span>
                 <span id="RefreshCmd" class="cmd fa fa-refresh"></span>
@@ -305,7 +308,7 @@
                             queryString += "&UserId=" + selectedUserId;
                         if(keywordSearch != ""){
                             let keywords = getKeywords();
-                            updateLocalStorageKeywords(keywords);
+                            updateKeywords(keywords);
                             queryString+= "&keywords=" + keywords.join(" ");
                         }
                     }
@@ -314,14 +317,25 @@
                 GET_ALL(refreshimagesList, error, prepareQueryString());
                 //GETUSERNAMES(DisplayUserNames, error);
             }
-            function updateLocalStorageKeywords(newKeywords){
+            function updateKeywords(newKeywords){
                 let keywords =[];
                 let keywordsFromStorage = localStorage.getItem("keywords");
-                if(keywordsFromStorage!= null){
+                if(keywordsFromStorage){
                     keywords = JSON.parse(keywordsFromStorage);
                 }
-                keywords.push(newKeywords);
+                newKeywords.forEach(newKeyword => {
+                    if(!keywords.includes(newKeyword))
+                        keywords.push(newKeyword);
+                });
                 localStorage.setItem("keywords", JSON.stringify(keywords));
+                createKeywordOptions(keywords);
+            }
+            function createKeywordOptions(keywords){
+                $("#keywordsData").empty();
+
+                keywords.forEach(keyword => {
+                    $("#keywordsData").append(`<option value="${keyword}">`);
+                });
             }
             function getKeywords(){
                 let result = [];
@@ -976,6 +990,12 @@
                 showLoginButtons(false);
 
                 //useRememberMe();
+
+                let keywordsFromStorage = localStorage.getItem("keywords");
+                if(keywordsFromStorage){
+                    keywordsFromStorage = JSON.parse(keywordsFromStorage);
+                    createKeywordOptions(keywordsFromStorage);
+                }
 
 
 
