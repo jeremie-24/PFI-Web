@@ -10,6 +10,7 @@
 
 const queryStringParser = require('query-string');
 const tokens = require("./data/Tokens.json");
+const TokenManager = require("./tokenManager");
 
 exports.capitalizeFirstLetter = capitalizeFirstLetter;
 function capitalizeFirstLetter(s) {
