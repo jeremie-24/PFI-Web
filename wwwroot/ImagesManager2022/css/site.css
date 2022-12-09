@@ -28,6 +28,10 @@ body {
     position: relative;
     
 }
+#image_avatar {
+    max-width: 200px;
+    max-height: 200px;
+}
 .rightHeaderLayout{
     display: grid;
     grid-template-columns: auto 60px;

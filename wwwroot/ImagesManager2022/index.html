@@ -114,16 +114,26 @@
                         <span>Titre: </span>
                         <span id="image_title"></span>
 
+                        <br>
+
                         <span>Description: </span>
                         <span id="image_description"></span>
 
+                        <br>
+
                         <a id="image_lien" href="" target="_blank"><img id="image_image" src="" alt="Image"></a>
+
+                        <br>
 
                         <span>Date de publication: </span>
                         <span id="image_date"></span>
 
+                        <br>
+
                         <span>Auteur: </span>
                         <span id="image_username"></span>
+
+                        <br>
 
                         <img id="image_avatar" src="" alt="Avatar de l'utilisateur">
                     </form>
@@ -454,14 +464,19 @@
             }
 
             function imageDetails(image){
-                $("#imageInfosDlg").dialog();
+                $("#imageInfosDlg").dialog('option', 'title', "Détails de l'image " + image.Title);
                 $("#image_title").text(image.Title);
                 $("#image_description").text(image.Description);
                 $("#image_lien").attr("href", image.OriginalURL);
                 $("#image_image").attr("src", image.ThumbnailURL);
-                $("#image_date").text(new Date(image.Date));
+                var date = image.Date;
+                if (typeof date === "string"){
+                    date = parseInt(date.toString());
+                }
+                $("#image_date").text(new Date(date).toLocaleDateString("fr"));
                 $("#image_username").text(image.UserName);
-                $("#image_avatar").text(image.AvatarURL);
+                $("#image_avatar").attr("src", image.AvatarURL);
+                $("#imageInfosDlg").dialog("open");
             }
 
             function error(status) {
@@ -990,7 +1005,7 @@
                     show: { effect: 'fade', speed: 400 },
                     hide: { effect: 'fade', speed: 400 },
                     width: 500, minWidth: 500, maxWidth: 500,
-                    height: 500, minHeight: 500, maxHeight: 500,
+                    height: 700, minHeight: 700, maxHeight: 700,
                     position: { my: "top", at: "top", of: window },
                     buttons: [{
                         text: "Fermer",
