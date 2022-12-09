@@ -48,14 +48,15 @@ module.exports =
         remove(id) {
             let token = utilities.getToken(require('../httpContext').get());
             let foundUser = super.get(id);
-            var ImagesRepository = require("./imagesRepository");
+            var ImagesRepository = require("./imagesRepository.js");
+            var imagesRepository = new ImagesRepository();
             if (foundUser && token != null && foundUser && id == token["UserId"]) {
 
                 //TODO supprimer les images aussi
                 var images = require("../data/Images.json");
                 images.forEach(element => {
-                    if (element.UserId == id){
-                        ImagesRepository.remove(element.Id);
+                    if (element["UserId"] && element.UserId == id){
+                        imagesRepository.remove(element.Id);
                     }
                 });
                 ImageFilesRepository.removeImageFile(foundUser["AvatarGUID"]);
