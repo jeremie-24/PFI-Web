@@ -88,6 +88,14 @@ function GETUSER(token, successCallBack, errorCallBack) {
     });
 }
 
+function GETUSERNAMES(successCallBack, errorCallBack) {
+    $.ajax({
+        url: apiBaseURL + "?fields=UserName",
+        type: 'GET',
+        success: (data) => { successCallBack(data) },
+        error: function (jqXHR) { errorCallBack(jqXHR.status) },
+    });
+}
 
 function REGISTER(data, successCallBack, errorCallBack) {
     $.ajax({

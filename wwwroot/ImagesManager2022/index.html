@@ -78,6 +78,24 @@
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
                     data-toggle="tooltip"></span>
+                <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
+            </div>
+        </div>
+
+        <div id="searchBar">
+            <div class="searchBarLayout">
+                <select id="searchCategory" class="form-control searchInput">
+                    <!-- filled programmatically-->
+                </select>
+                <span>
+                    <!-- skip a column -->
+                </span>
+                <input type="search" id="searchTitle" class="form-control searchInput"
+                    placeholder="Recherche de nouvelles" />
+                <span>
+                    <!-- skip a column -->
+                </span>
+                <span class="cmd fa fa-refresh"></span>
             </div>
         </div>
 
@@ -803,7 +821,29 @@
 
             }
 
+            var searchBarIsShown = false;
+
+            function DisplayUserNames(names){
+                for (let name of names) {
+                    $("#searchCategory").append(`<option>${name.UserName}</option>`);
+                }
+            }
+            
+            function ToggleSearchBar(){
+                GETUSERNAMES(DisplayUserNames, error);
+                if (searchBarIsShown){
+                    $("#searchBar").hide();
+                    searchBarIsShown = false;
+                }
+                else{
+                    $("#searchBar").show();
+                    searchBarIsShown = true;
+                }
+            }
+
             function init_UI() {
+                $("#searchBar").hide();
+                $("#SearchCmd").click(ToggleSearchBar)
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
                 $("#modifyUserCmd").click(modifyUser);
