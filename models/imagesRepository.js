@@ -8,6 +8,7 @@ const utilities = require("../utilities");
 const Token = require('./token.js');
 const TokenManager = require('../tokenManager');
 const HttpContext = require('../httpContext').get();
+const CollectionFilter = require("./collectionFilter.js");
 
 module.exports =
     class ImagesRepository extends require('./repository') {
@@ -60,4 +61,90 @@ module.exports =
             }
             return false;
         }
+        getAll(params = null) {
+            let objectsList = this.objects();
+            if (this.bindExtraDataMethod != null) {
+              objectsList = this.bindExtraData(objectsList);
+            }
+            if (params) {
+               objectsList =  this.getKeywordsObjectList(objectsList, params);
+                let collectionFilter = new CollectionFilter(
+                    objectsList,
+                    params,
+                    this.model
+                  );
+                return collectionFilter.get();
+            }
+            return objectsList;
+        }
+        getKeywordsObjectList(objectsList, params){
+            let keywords;
+            if (params && params["keywords"]) {
+                if(!params["keywords"] ||params["keywords"].Length < 1){
+                    return objectsList;
+                }
+                keywords = this.getKeywords(params["keywords"]);
+            }
+            if(keywords){
+                objectsList = this.searchKeywordsObjectList(objectsList, keywords);
+            }
+            return objectsList;
+        }
+        getKeywords(paramKeywords){
+            let keywords = paramKeywords.split(" ");
+            return keywords;
+        }
+        searchKeywordsObjectList(objectsList, keywords){
+            let result = objectsList;
+            /*
+            keywords.forEach(keyword =>{
+                result.push(this.getKeywordFilterResult(objectsList, keyword));
+            })
+            */
+            result = objectsList.filter(object => this.evaluatedKeysContainsKeyword(object, keywords))
+            return result;
+        }
+        /*
+        getKeywordFilterResult(objectsList, keyword){           
+            return objectsList.filter(object => this.evaluatedKeysContainsKeyword(object, keyword))
+        }
+        
+        evaluatedKeysContainsKeyword(object, keyword){
+            let containsKeyword = false;
+            let evaluatedKeys = ["Title", "Description"];
+            evaluatedKeys.forEach(key => {
+                if(this.containsKeyword(object[key], keyword)){
+                    return true;
+                };
+            });
+            return containsKeyword;
+        }
+        */
+        evaluatedKeysContainsKeyword(object, keywords){
+            let containsKeyword = false;
+            let evaluatedKeys = ["Title", "Description"];
+            evaluatedKeys.forEach(key => {
+                keywords.forEach(keyword => {
+                    if(!containsKeyword && this.containsKeyword(object[key], keyword)){
+                        containsKeyword = true;
+                    };
+                })
+            });
+            return containsKeyword;
+        }
+        containsKeyword(value, keyword){
+            return this.valueMatch(value, `*${keyword}*`)
+        }
+
+        valueMatch(value, searchValue) {
+            try {
+                let sv = '^' + searchValue.toLowerCase().replace(/\*/g, '.*') + '$';
+                let v = value.toString().replace(/(\r\n|\n|\r)/gm, "").toLowerCase();
+                return new RegExp(sv).test(v);
+            } catch (error) {
+                console.log(error);
+                return false;
+            }
+        }
+
     }
