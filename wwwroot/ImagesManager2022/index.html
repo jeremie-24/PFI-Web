@@ -61,6 +61,9 @@
 
                 <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
+                <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short"></span>
+                <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"></span>
+                <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
                     data-toggle="tooltip"></span>
 
@@ -78,7 +81,6 @@
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
                     data-toggle="tooltip"></span>
-                <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
             </div>
         </div>
 
@@ -263,6 +265,7 @@
             let user;
             let userToken;
             let searchBarIsShown = false;
+            let dateSort = "desc";
 
             let userCreateMode = true;
 
@@ -284,11 +287,12 @@
                 
                 function prepareQueryString() {
                     let queryString = "";
+                    let dateSortString = "sort=Date," + dateSort;
                     if (appendMode) {
-                        queryString = `?sort=Date,desc&offset=${Math.trunc(imagesCount / appendCount)}&limit=${appendCount}`;
+                        queryString = `?${dateSortString}&offset=${Math.trunc(imagesCount / appendCount)}&limit=${appendCount}`;
                         imagesCount += appendCount;
                     } else {
-                        queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
+                        queryString = `?${dateSortString}sort=Date,desc&offset=${0}&limit=${imagesCount}`;
                     }
                     if (searchBarIsShown) {
                         selectedUserId = $("#searchUserName").val();
@@ -317,6 +321,7 @@
                 let login = getLoginFromUser(data);
                 updateRememberMe(login);
                 */
+                ResetSearchBar();
             }
             function isVerified(user) {
                 return user.VerifyCode == "verified";
@@ -391,6 +396,7 @@
                 getUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
+                ResetSearchBar();
             }
             function rememberMe(login) {
                 /*
@@ -819,6 +825,7 @@
                         let userFromSession = sessionStorage.getItem(userSessionStorageName);
                         if (userFromSession != null) {
                             updateUser(JSON.parse(userFromSession));
+                            ResetSearchBar();
                         }
                         else {
                             getUser(userToken);
@@ -831,8 +838,16 @@
             }
 
             function DisplayUserNames(names){
+                ClearUserNames();
+                $("#searchUserName").append(`<option value="">Toutes les images</option>`);
+                if (user && user["Id"]){
+                    $("#searchUserName").append(`<option value=${user.Id}>Mes images</option>`);
+                }
+                
                 for (let name of names) {
-                    $("#searchUserName").append(`<option value=${name.UserId}>${name.UserName}</option>`);
+                    if (!user || name.UserId != user.Id){
+                        $("#searchUserName").append(`<option value=${name.UserId}>${name.UserName}</option>`);
+                    }
                 }
             }
 
@@ -841,19 +856,38 @@
             }
             
             function ToggleSearchBar(){
-                ClearUserNames();
-                GETUSERNAMES(DisplayUserNames, error);
                 if (searchBarIsShown){
                     $("#searchBar").hide();
                     searchBarIsShown = false;
                 }
                 else{
+                    GETUSERNAMES(DisplayUserNames, error);
                     $("#searchBar").show();
                     searchBarIsShown = true;
                 }
             }
 
+            function ResetSearchBar(){
+                GETUSERNAMES(DisplayUserNames, error);
+                getImagesList(true);
+            }
+
+            function SwitchDateSort(){
+                if (dateSort == "asc"){
+                    dateSort = "desc";;
+                    $("#Date_Desc").show();
+                    $("#Date_Asc").hide();
+                }
+                else{
+                    dateSort = "asc";
+                    $("#Date_Desc").hide();
+                    $("#Date_Asc").show();
+                }
+                getImagesList(true);
+            }
+
             function init_UI() {
+                $("#Date_Asc").hide();
                 $("#searchBar").hide();
                 $("#SearchCmd").click(ToggleSearchBar)
                 $("#newImageCmd").click(newImage);
@@ -863,6 +897,8 @@
                 $("#logoutCmd").click(logout);
                 $("#creditCmd").click(credits);
                 $("#RefreshCmd").click(e => {getImagesList(true)});
+                $("#Date_Desc").click(SwitchDateSort);
+                $("#Date_Asc").click(SwitchDateSort);
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
@@ -991,6 +1027,7 @@
                             userToken = null;
                             holdCheckETag = false;
                             $(this).dialog("close");
+                            ResetSearchBar();
                         }
                     },
                     {
