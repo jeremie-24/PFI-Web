@@ -78,6 +78,25 @@
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-sign-out loggedDiv" id="logoutCmd" title="Se déconnecter"
                     data-toggle="tooltip"></span>
+                <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche"
+                    data-toggle="tooltip"></span>
+            </div>
+        </div>
+
+        <div id="searchBar">
+            <div class="searchBarLayout">
+                <select id="searchUserName" class="form-control searchInput">
+                    <!-- filled programmatically-->
+                </select>
+                <span>
+                    <!-- skip a column -->
+                </span>
+                <input type="search" id="keywordSearch" class="form-control searchInput"
+                    placeholder="Recherche par mots-clés" />
+                <span>
+                    <!-- skip a column -->
+                </span>
+                <span id="RefreshCmd" class="cmd fa fa-refresh"></span>
             </div>
         </div>
 
@@ -109,6 +128,35 @@
                     </form>
                 </div>
 
+                <div id="imageInfosDlg">
+                    <form id="imageForm">
+                        <span>Titre: </span>
+                        <span id="image_title"></span>
+
+                        <br>
+
+                        <span>Description: </span>
+                        <span id="image_description"></span>
+
+                        <br>
+
+                        <a id="image_lien" href="" target="_blank"><img id="image_image" src="" alt="Image"></a>
+
+                        <br>
+
+                        <span>Date de publication: </span>
+                        <span id="image_date"></span>
+
+                        <br>
+
+                        <span>Auteur: </span>
+                        <span id="image_username"></span>
+
+                        <br>
+
+                        <img id="image_avatar" src="" alt="Avatar de l'utilisateur">
+                    </form>
+                </div>
 
                 <div id="userDlg">
                     <form id="userForm">
@@ -205,11 +253,11 @@
             let holdCheckETag = false;
             let currentETag = "";
             let createMode = true;
-            let searchCategory = "";
-            let searchTitle = "";
+            let searchUserName = "";
+            let keywordSearch = "";
             let hideSearchBar = true;
             let imageIdToDelete = 0; // used by confirmDeleteDlg
-            let selectedCategory = "";
+            let selectedUserName = "";
             let imagesCount = 50;
             let appendCount = 3;
             let previousScrollPosition = 0;
@@ -217,6 +265,7 @@
             let token;
             let user;
             let userToken;
+            let searchBarIsShown = false;
 
             let userCreateMode = true;
 
@@ -242,6 +291,15 @@
                         imagesCount += appendCount;
                     } else {
                         queryString = `?sort=Date,desc&offset=${0}&limit=${imagesCount}`;
+                    }
+                    if (searchBarIsShown) {
+                        selectedUserId = $("#searchUserName").val();
+                        let keywordSearch = $("#keywordSearch").val();
+                        if (selectedUserId != "")
+                            queryString += "&UserId=" + selectedUserId;
+                        if(keywordSearch != ""){
+                            queryString+= "&keywords=" + keywordSearch;
+                        }
                     }
                     return queryString;
                 }
@@ -309,10 +367,10 @@
                 if (isLogged) {
                     $(".loginDiv").hide();
                     $(".loggedDiv").show();
-                    if(user && isVerified(user)){
+                    if (user && isVerified(user)) {
                         $(".verifiedDiv").show();
                     }
-                    else{
+                    else {
                         $(".verifiedDiv").hide();
                     }
                 }
@@ -321,7 +379,7 @@
                     $(".loggedDiv").hide();
                     $(".verifiedDiv").hide();
                 }
-               
+
             }
 
             function changeToken(newToken) {
@@ -386,13 +444,13 @@
                     var isOwned = user && user["Id"] && image.UserId == user.Id;
 
                     if (isOwned) {
-                        if(image.Shared){
+                        if (image.Shared) {
                             imageUrl = "images/shared.png";
                         }
-                        else{
+                        else {
                             imageUrl = "images/notShared.png"
                         }
-                        if(isVerified(user)){
+                        if (isVerified(user)) {
                             header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
                                                 imageid="${image.Id}" 
@@ -405,7 +463,7 @@
                                                 data-toggle="tooltip">
                                         </div>`
                         }
-                        
+
                     }
 
                     if (image.Shared || isOwned) {
@@ -429,6 +487,8 @@
                         `)
                         );
                     }
+
+                    $("#image_div_" + image.Id).click(e => { imageDetails(image) });
                 }
                 currentETag = ETag;
                 previousScrollPosition = $(".scrollContainer").scrollTop();
@@ -451,6 +511,21 @@
                 $('[data-toggle="tooltip"]').tooltip();
             }
 
+            function imageDetails(image){
+                $("#imageInfosDlg").dialog('option', 'title', "Détails de l'image " + image.Title);
+                $("#image_title").text(image.Title);
+                $("#image_description").text(image.Description);
+                $("#image_lien").attr("href", image.OriginalURL);
+                $("#image_image").attr("src", image.ThumbnailURL);
+                var date = image.Date;
+                if (typeof date === "string"){
+                    date = parseInt(date.toString());
+                }
+                $("#image_date").text(new Date(date).toLocaleDateString("fr"));
+                $("#image_username").text(image.UserName);
+                $("#image_avatar").attr("src", image.AvatarURL);
+                $("#imageInfosDlg").dialog("open");
+            }
             function error(status) {
                 let errorMessage = "";
                 switch (status) {
@@ -501,15 +576,15 @@
                 $("#logoutDlgOkBtn").text("Déconnexion");
                 $("#logoutDlg").dialog('open');
             }
-            function logoutOfAccount(apiRequest = true){
+            function logoutOfAccount(apiRequest = true) {
                 sessionStorage.removeItem("token");
                 sessionStorage.removeItem(userSessionStorageName);
-                            
 
-                if(apiRequest){
+
+                if (apiRequest) {
                     LOGOUT(user.Id, () => console.log("Déconnexion"), error);
                 }
-            
+
                 resetUserForm();
                 showLoginButtons(false);
                 getImagesList();
@@ -765,6 +840,7 @@
                     Password: $("#password_input").val()
                 }
                 resetUserForm();
+
                 TOKEN(login, changeToken, error);
                 //resetUserForm();
                 $("#verifyCodeDlg").dialog('open');
@@ -792,13 +868,39 @@
 
             }
 
+            function DisplayUserNames(names){
+                for (let name of names) {
+                    $("#searchUserName").append(`<option value=${name.UserId}>${name.UserName}</option>`);
+                }
+            }
+
+            function ClearUserNames(){
+                $("#searchUserName").empty();
+            }
+            
+            function ToggleSearchBar(){
+                ClearUserNames();
+                GETUSERNAMES(DisplayUserNames, error);
+                if (searchBarIsShown){
+                    $("#searchBar").hide();
+                    searchBarIsShown = false;
+                }
+                else{
+                    $("#searchBar").show();
+                    searchBarIsShown = true;
+                }
+            }
+
             function init_UI() {
+                $("#searchBar").hide();
+                $("#SearchCmd").click(ToggleSearchBar)
                 $("#newImageCmd").click(newImage);
                 $("#newUserCmd").click(newUser);
                 $("#modifyUserCmd").click(modifyUser);
                 $("#loginCmd").click(login);
                 $("#logoutCmd").click(logout);
                 $("#creditCmd").click(credits);
+                $("#RefreshCmd").click(e => {getImagesList(true)});
                 //$(".loggedDiv").hide();
                 showLoginButtons(false);
 
@@ -992,6 +1094,24 @@
                     }]
                 });
 
+                $("#imageInfosDlg").dialog({
+                    title: "Informations de l'image",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 500, minWidth: 500, maxWidth: 500,
+                    height: 700, minHeight: 700, maxHeight: 700,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        text: "Fermer",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
+                });
+
                 $(".scrollContainer").scroll(function () {
                     if ($(".scrollContainer").scrollTop() + $(".scrollContainer").innerHeight() >= $("#imagesList").height()) {
                         getImagesList(false);
@@ -1014,44 +1134,44 @@
                     maxHeight: 780,
                     position: { my: "top", at: "top", of: window },
                     buttons: [
-                    {
-                        id: "userDlgDeleteBtn",
-                        text: "Désinscrire",
-                        click: function () {
-                            holdCheckETag = true;
-                            $("#confirmDeleteUserDlg").dialog('open');
-                            $(this).dialog("close");
-                        }
-                    },
-                    {
-                        id: "userDlgOkBtn",
-                        text: "Title will be changed dynamically",
-                        click: function () {
+                        {
+                            id: "userDlgDeleteBtn",
+                            text: "Désinscrire",
+                            click: function () {
+                                holdCheckETag = true;
+                                $("#confirmDeleteUserDlg").dialog('open');
+                                $(this).dialog("close");
+                            }
+                        },
+                        {
+                            id: "userDlgOkBtn",
+                            text: "Title will be changed dynamically",
+                            click: function () {
 
-                            let FormUser = userFromForm();
+                                let FormUser = userFromForm();
 
-                            if (FormUser) {
-                                if (userCreateMode) {
-                                    REGISTER(FormUser, firstLogin, error);
-                                    $(".scrollContainer").scrollTop(0);
+                                if (FormUser) {
+                                    if (userCreateMode) {
+                                        REGISTER(FormUser, firstLogin, error);
+                                        $(".scrollContainer").scrollTop(0);
+                                    }
+                                    else {
+                                        MODIFY_USER(FormUser, token, (data) => updateAfterModify(FormUser), error);
+                                        resetUserForm();
+                                    }
+                                    holdCheckETag = false;
+                                    $(this).dialog("close");
                                 }
-                                else {
-                                    MODIFY_USER(FormUser, token, (data) => updateAfterModify(FormUser), error);
-                                    resetUserForm();
-                                }
+
+                            }
+                        },
+                        {
+                            text: "Annuler",
+                            click: function () {
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
-
-                        }
-                    },
-                    {
-                        text: "Annuler",
-                        click: function () {
-                            holdCheckETag = false;
-                            $(this).dialog("close");
-                        }
-                    }]
+                        }]
                 });
 
                 $("#verifyCodeDlg").dialog({
@@ -1110,7 +1230,7 @@
                         click: function () {
                             holdCheckETag = false;
                             let FormUser = userFromForm();
-                            if (FormUser){
+                            if (FormUser) {
                                 holdCheckETag = false;
                                 DELETE_USER(FormUser.Id, token, () => logoutOfAccount(false), error);
                             }
@@ -1129,7 +1249,7 @@
             }
         </script>
 
-        <!--           //TODO ajouter une image enlever boutton si pas verifie ou pas connecté, empecher image si pas verified-->
+        <!--           //TODO keywords client, sort, glitch-->
 </body>
 
 </html>

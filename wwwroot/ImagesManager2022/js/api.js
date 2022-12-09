@@ -7,7 +7,7 @@ const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
 const userModifyUrl = accountsApiUrl + "/modify";
 const userLogoutUrl = accountsApiUrl + "/logout";
-const userDeleteUrl = accountsApiUrl + "/delete";
+const userDeleteUrl = accountsApiUrl + "/remove";
 const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
