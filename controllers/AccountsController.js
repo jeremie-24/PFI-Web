@@ -132,7 +132,6 @@ module.exports =
         }
         // GET:account/remove/id
         remove(id) { // warning! this is not an API endpoint
-            //TODO remove avatar
             super.remove(id);
         }
     }
