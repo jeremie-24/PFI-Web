@@ -109,6 +109,26 @@
                     </form>
                 </div>
 
+                <div id="imageInfosDlg">
+                    <form id="imageForm">
+                        <span>Titre: </span>
+                        <span id="image_title"></span>
+
+                        <span>Description: </span>
+                        <span id="image_description"></span>
+
+                        <a id="image_lien" href="" target="_blank"><img id="image_image" src="" alt="Image"></a>
+
+                        <span>Date de publication: </span>
+                        <span id="image_date"></span>
+
+                        <span>Auteur: </span>
+                        <span id="image_username"></span>
+
+                        <img id="image_avatar" src="" alt="Avatar de l'utilisateur">
+                    </form>
+                </div>
+
 
                 <div id="userDlg">
                     <form id="userForm">
@@ -395,19 +415,22 @@
                                         <div class="imageTitle">${image.Title}</div>
                                     ${header}
                                     </div>
-                                    <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
+                                    <div>
                                         <img class="avatarOnImage" src="${imageUrl}" alt="">
-                                        <div    class='image' 
+                                        <div    id="image_div_${image.Id}"
+                                                class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
                                                 title="Image de ${image.UserName}" 
                                                 data-toggle="tooltip">
                                         </div>
-                                    </a>
+                                    </div>
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
                         );
                     }
+
+                    $("#image_div_" + image.Id).click(e => { imageDetails(image) });
                 }
                 currentETag = ETag;
                 previousScrollPosition = $(".scrollContainer").scrollTop();
@@ -428,6 +451,17 @@
                 $(".deleteCmd").click(e => { deleteimage(e) });
 
                 $('[data-toggle="tooltip"]').tooltip();
+            }
+
+            function imageDetails(image){
+                $("#imageInfosDlg").dialog();
+                $("#image_title").text(image.Title);
+                $("#image_description").text(image.Description);
+                $("#image_lien").attr("href", image.OriginalURL);
+                $("#image_image").attr("src", image.ThumbnailURL);
+                $("#image_date").text(new Date(image.Date));
+                $("#image_username").text(image.UserName);
+                $("#image_avatar").text(image.AvatarURL);
             }
 
             function error(status) {
@@ -944,6 +978,24 @@
                         click: function () {
                             holdCheckETag = false;
                             imageIdToDelete = 0;
+                            $(this).dialog("close");
+                        }
+                    }]
+                });
+
+                $("#imageInfosDlg").dialog({
+                    title: "Informations de l'image",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 500, minWidth: 500, maxWidth: 500,
+                    height: 500, minHeight: 500, maxHeight: 500,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        text: "Fermer",
+                        click: function () {
+                            holdCheckETag = false;
                             $(this).dialog("close");
                         }
                     }]
