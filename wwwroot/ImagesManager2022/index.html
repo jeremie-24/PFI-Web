@@ -59,11 +59,11 @@
                     </span>
                 </div>
 
-                <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
+                <span class="cmd fa fa-plus-square verifiedDiv" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short"></span>
-                <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"></span>
-                <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
+                    <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short"></span>
+                    <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"></span>
+                    <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
                     data-toggle="tooltip"></span>
 
@@ -92,8 +92,8 @@
                 <span>
                     <!-- skip a column -->
                 </span>
-                <input type="search" id="searchTitle" class="form-control searchInput"
-                    placeholder="Mots clés" />
+                <input type="search" id="keywordSearch" class="form-control searchInput"
+                    placeholder="Recherche par mots-clés" />
                 <span>
                     <!-- skip a column -->
                 </span>
@@ -158,7 +158,6 @@
                         <img id="image_avatar" src="" alt="Avatar de l'utilisateur">
                     </form>
                 </div>
-
 
                 <div id="userDlg">
                     <form id="userForm">
@@ -256,7 +255,7 @@
             let currentETag = "";
             let createMode = true;
             let searchUserName = "";
-            let searchTitle = "";
+            let keywordSearch = "";
             let hideSearchBar = true;
             let imageIdToDelete = 0; // used by confirmDeleteDlg
             let selectedUserName = "";
@@ -287,8 +286,7 @@
 
             function getImagesList(refresh = true) {
                 appendMode = !refresh;
-                GETUSERNAMES(DisplayUserNames, error);
-                
+
                 function prepareQueryString() {
                     let queryString = "";
                     let dateSortString = "sort=Date," + dateSort;
@@ -296,19 +294,44 @@
                         queryString = `?${dateSortString}&offset=${Math.trunc(imagesCount / appendCount)}&limit=${appendCount}`;
                         imagesCount += appendCount;
                     } else {
-                        queryString = `?${dateSortString}sort=Date,desc&offset=${0}&limit=${imagesCount}`;
+                        queryString = `?${dateSortString}&offset=${0}&limit=${imagesCount}`;
                     }
                     if (searchBarIsShown) {
                         selectedUserId = $("#searchUserName").val();
-                        let searchTitle = $("#searchTitle").val();
+                        keywordSearch = $("#keywordSearch").val();
                         if (selectedUserId != "")
                             queryString += "&UserId=" + selectedUserId;
-                            //TODO ajouter les keywords
+                        if(keywordSearch != ""){
+                            let keywords = getKeywords();
+                            updateLocalStorageKeywords(keywords);
+                            queryString+= "&keywords=" + keywords.join(" ");
+                        }
                     }
                     return queryString;
                 }
                 GET_ALL(refreshimagesList, error, prepareQueryString());
+                GETUSERNAMES(DisplayUserNames, error);
             }
+            function updateLocalStorageKeywords(newKeywords){
+                let keywords =[];
+                let keywordsFromStorage = localStorage.getItem("keywords");
+                if(keywordsFromStorage!= null){
+                    keywords = JSON.parse(keywordsFromStorage);
+                }
+                keywords.push(newKeywords);
+                localStorage.setItem("keywords", JSON.stringify(keywords));
+            }
+            function getKeywords(){
+                let result = [];
+                let keywords = keywordSearch.split(" ");
+                keywords.forEach((keyword) => {
+                    let trimmedKeyword = keyword.trim();
+                    if(trimmedKeyword != "")
+                        result.push(keyword.trim());
+                })
+                return result;
+            }
+            
 
             function updateUser(data) {
                 if (data == user) {
@@ -322,12 +345,12 @@
                 $("#usernameContainer").html(getUserNameSpan(data));
 
                 getImagesList();
-
+                showLoginButtons(true);
                 /*
                 let login = getLoginFromUser(data);
                 updateRememberMe(login);
                 */
-                ResetSearchBar();
+                 //ResetSearchBar();
             }
             function isVerified(user) {
                 return user.VerifyCode == "verified";
@@ -384,6 +407,7 @@
                     $(".loggedDiv").hide();
                     $(".verifiedDiv").hide();
                 }
+
             }
 
             function changeToken(newToken) {
@@ -396,7 +420,7 @@
                 /*
                 var isChecked = $("#remember_input").prop('checked');
                 sessionStorage.setItem("token", JSON.stringify(newToken));
-                if (ihoChecked) {
+                if (isChecked) {
                     window.localStorage.setItem("token", JSON.stringify(newToken));
                 }
                 else {
@@ -445,7 +469,7 @@
                     var imageUrl = image.AvatarURL;
                     var header = "";
 
-                    var isOwned = user && user["Id"] && image.UserId == user.Id
+                    var isOwned = user && user["Id"] && image.UserId == user.Id;
 
                     if (isOwned) {
                         if (image.Shared) {
@@ -469,6 +493,7 @@
                         }
 
                     }
+
                     if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
@@ -512,6 +537,7 @@
                 $(".deleteCmd").click(e => { deleteimage(e) });
 
                 $('[data-toggle="tooltip"]').tooltip();
+                
             }
 
             function imageDetails(image){
@@ -529,7 +555,6 @@
                 $("#image_avatar").attr("src", image.AvatarURL);
                 $("#imageInfosDlg").dialog("open");
             }
-
             function error(status) {
                 let errorMessage = "";
                 switch (status) {
@@ -891,6 +916,8 @@
             }
             
             function ToggleSearchBar(){
+                //ClearUserNames();
+                //GETUSERNAMES(DisplayUserNames, error);
                 if (searchBarIsShown){
                     $("#searchBar").hide();
                     searchBarIsShown = false;
@@ -919,7 +946,6 @@
                 }
                 getImagesList(true);
             }
-
             function init_UI() {
                 $("#Date_Asc").hide();
                 $("#searchBar").hide();
@@ -937,6 +963,8 @@
                 showLoginButtons(false);
 
                 //useRememberMe();
+
+
 
                 // Images
                 $("#imageDlg").dialog({
@@ -1233,6 +1261,7 @@
                                 holdCheckETag = false;
                                 $(this).dialog("close");
                             }
+
                         }
                     },
                     {
@@ -1278,6 +1307,7 @@
             }
         </script>
 
+        <!--           //TODO keywords storage, glitch-->
 </body>
 
 </html>
