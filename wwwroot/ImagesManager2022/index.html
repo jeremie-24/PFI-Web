@@ -409,7 +409,6 @@
                 getUser(newToken);
                 showLoginButtons(true);
                 getImagesList(true);
-                ResetSearchBar();
             }
             function rememberMe(login) {
                 /*
@@ -862,7 +861,6 @@
                         let userFromSession = sessionStorage.getItem(userSessionStorageName);
                         if (userFromSession != null) {
                             updateUser(JSON.parse(userFromSession));
-                            ResetSearchBar();
                         }
                         else {
                             getUser(userToken);
