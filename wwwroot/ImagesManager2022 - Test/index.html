@@ -177,6 +177,9 @@
                 <div id="confirmDeleteDlg">
                     <span id="confirmationMessage"></span>
                 </div>
+                <div id="confirmDeleteUserDlg">
+                    <span id="confirmationUserMessage">Voulez-vous vraiment effacer votre compte?</span>
+                </div>
                 <div id="errorDlg">
                     <span id="errorMessage"></span>
                 </div>
@@ -255,6 +258,8 @@
                 sessionStorage.setItem(userSessionStorageName, JSON.stringify(user));
                 $("#userImage").attr("src", data.AvatarURL);
                 $("#usernameContainer").html(getUserNameSpan(data));
+
+                getImagesList();
 
                 /*
                 let login = getLoginFromUser(data);
@@ -370,8 +375,15 @@
                     var imageUrl = image.AvatarURL;
                     var header = "";
 
-                    if (user && user["Id"] && image.UserId == user.Id) {
-                        imageUrl = "images/shared.png";
+                    var isOwned = user && user["Id"] && image.UserId == user.Id;
+
+                    if (isOwned) {
+                        if(image.Shared){
+                            imageUrl = "images/shared.png";
+                        }
+                        else{
+                            imageUrl = "images/notShared.png"
+                        }
                         header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
                                                 imageid="${image.Id}" 
@@ -385,7 +397,7 @@
                                         </div>`
                     }
 
-                    if (image.Shared) {
+                    if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
                                 <div class='imageLayout'>
@@ -394,11 +406,11 @@
                                     ${header}
                                     </div>
                                     <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
-                                        <img class="avatarOnImage" src="${imageUrl}" alt="">
+                                        <img class="avatarOnImage" src="${imageUrl}" alt="" title="Image de ${image.UserName}" 
+                                                data-toggle="tooltip">
                                         <div    class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
-                                                title="Image de ${image.UserName}" 
-                                                data-toggle="tooltip">
+                                                >
                                         </div>
                                     </a>
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
@@ -477,6 +489,22 @@
                 $("#logoutDlg").dialog('option', 'title', 'Déconnexion');
                 $("#logoutDlgOkBtn").text("Déconnexion");
                 $("#logoutDlg").dialog('open');
+            }
+            function logoutOfAccount(apiRequest = true){
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem(userSessionStorageName);
+                            
+
+                if(apiRequest){
+                    LOGOUT(user.Id, () => console.log("Déconnexion"), error);
+                }
+            
+                resetUserForm();
+                showLoginButtons(false);
+                getImagesList();
+                user = null;
+                token = null;
+                userToken = null;
             }
             function login() {
                 holdCheckETag = true;
@@ -635,6 +663,7 @@
                 ImageUploader.imageRequired('avatar', true);
                 $("#password_input").prop('required', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
+                $("#userDlgDeleteBtn").hide();
                 $("#userDlgOkBtn").text('Créer');
                 $("#userDlg").dialog('open');
             }
@@ -647,6 +676,7 @@
                 $("#password_input").prop('required', false);
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
+                $("#userDlgDeleteBtn").show();
                 $("#userDlg").dialog('open');
             }
             function updateAfterModify(modifiedUser) {
@@ -876,6 +906,7 @@
                         id: "logoutDlgOkBtn",
                         text: "Oui",
                         click: function () {
+                            /*
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem(userSessionStorageName);
                             //window.localStorage.setItem("token", token);
@@ -887,6 +918,8 @@
                             token = null;
                             userToken = null;
                             holdCheckETag = false;
+                            */
+                            logoutOfAccount();
                             $(this).dialog("close");
                         }
                     },
@@ -969,7 +1002,17 @@
                     minHeight: 650,
                     maxHeight: 780,
                     position: { my: "top", at: "top", of: window },
-                    buttons: [{
+                    buttons: [
+                    {
+                        id: "userDlgDeleteBtn",
+                        text: "Désinscrire",
+                        click: function () {
+                            holdCheckETag = true;
+                            $("#confirmDeleteUserDlg").dialog('open');
+                            $(this).dialog("close");
+                        }
+                    },
+                    {
                         id: "userDlgOkBtn",
                         text: "Title will be changed dynamically",
                         click: function () {
@@ -1040,10 +1083,42 @@
                         }
                     }]
                 });
+
+                $("#confirmDeleteUserDlg").dialog({
+                    title: "Attention!",
+                    autoOpen: false,
+                    modal: true,
+                    show: { effect: 'fade', speed: 400 },
+                    hide: { effect: 'fade', speed: 400 },
+                    width: 500, minWidth: 500, maxWidth: 500,
+                    height: 230, minHeight: 230, maxHeight: 230,
+                    position: { my: "top", at: "top", of: window },
+                    buttons: [{
+                        id: "confirmDeleteUserDlgOkBtn",
+                        text: "Oui",
+                        click: function () {
+                            holdCheckETag = false;
+                            let FormUser = userFromForm();
+                            if (FormUser){
+                                holdCheckETag = false;
+                                DELETE_USER(FormUser.Id, token, () => logoutOfAccount(false), error);
+                            }
+                            resetUserForm();
+                            $(this).dialog("close");
+                        }
+                    },
+                    {
+                        text: "Annuler",
+                        click: function () {
+                            holdCheckETag = false;
+                            $(this).dialog("close");
+                        }
+                    }]
+                });
             }
         </script>
 
-        <!--           //TODO delete user dans modify, empecher image si pas verified-->
+        <!--           //TODO faire qu'on peut voir nos image pas shared,ajouter une image enlever boutton si pas verifie ou pas connecté,delete user dans modify, empecher image si pas verified-->
 </body>
 
 </html>
