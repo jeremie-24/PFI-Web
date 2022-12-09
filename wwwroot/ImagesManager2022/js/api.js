@@ -7,6 +7,7 @@ const registerUrl = accountsApiUrl + "/register";
 const verifyUrl = accountsApiUrl + "/verify";
 const userModifyUrl = accountsApiUrl + "/modify";
 const userLogoutUrl = accountsApiUrl + "/logout";
+const userDeleteUrl = accountsApiUrl + "/delete";
 const accountsGet = host + "/api/accounts/";
 
 function HEAD(successCallBack, errorCallBack) {
@@ -132,7 +133,7 @@ function LOGOUT(userId,successCallBack, errorCallBack) {
 
 function DELETE_USER(id, token, successCallBack, errorCallBack) {
     $.ajax({
-        url: accountsApiUrl + "/" + id,
+        url: userDeleteUrl + "/" + id,
         type: 'GET',
         success: () => { successCallBack() },
         error: function (jqXHR) { errorCallBack(jqXHR.status) },
