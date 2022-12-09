@@ -59,7 +59,7 @@
                     </span>
                 </div>
 
-                <span class="cmd fa fa-plus-square" id="newImageCmd" title="Ajouter un image"
+                <span class="cmd fa fa-plus-square verifiedDiv" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
                     data-toggle="tooltip"></span>
@@ -309,11 +309,19 @@
                 if (isLogged) {
                     $(".loginDiv").hide();
                     $(".loggedDiv").show();
+                    if(user && isVerified(user)){
+                        $(".verifiedDiv").show();
+                    }
+                    else{
+                        $(".verifiedDiv").hide();
+                    }
                 }
                 else {
                     $(".loginDiv").show();
                     $(".loggedDiv").hide();
+                    $(".verifiedDiv").hide();
                 }
+               
             }
 
             function changeToken(newToken) {
@@ -384,7 +392,8 @@
                         else{
                             imageUrl = "images/notShared.png"
                         }
-                        header = `
+                        if(isVerified(user)){
+                            header = `
                                         <div    class="cmd editCmd  fa fa-pencil-square" 
                                                 imageid="${image.Id}" 
                                                 title="Editer ${image.Title}" 
@@ -395,6 +404,8 @@
                                                 title="Effacer ${image.Title}" 
                                                 data-toggle="tooltip">
                                         </div>`
+                        }
+                        
                     }
 
                     if (image.Shared || isOwned) {
@@ -1118,7 +1129,7 @@
             }
         </script>
 
-        <!--           //TODO faire qu'on peut voir nos image pas shared,ajouter une image enlever boutton si pas verifie ou pas connecté,delete user dans modify, empecher image si pas verified-->
+        <!--           //TODO ajouter une image enlever boutton si pas verifie ou pas connecté, empecher image si pas verified-->
 </body>
 
 </html>
