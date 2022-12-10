@@ -513,7 +513,7 @@
                     if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
-                                <div class='imageLayout' id="#image_div_${image.Id}">
+                                <div class='imageLayout' id="image_div_${image.Id}">
                                     <div class='imageHeader'>
                                         <div class="imageTitle">${image.Title}</div>
                                     ${header}
@@ -531,7 +531,6 @@
                                 </div>
                         `)
                         );
-                        // TODO vérifier ne marche pas!!!!
                         $(`#image_div_${image.Id}`).click((e) => { imageDetails(image) });
                     }
 
@@ -1342,7 +1341,7 @@
             }
         </script>
 
-        <!--           //TODO verifier dialog image, glitch-->
+        <!--           //TODO verifier css dialog image, glitch-->
 </body>
 
 </html>
