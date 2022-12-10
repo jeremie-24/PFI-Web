@@ -183,7 +183,7 @@
 
                         <!--<label for="passwordConfirm_input">Confirmation</label>-->
                         <input type="password" id="passwordConfirm_input" placeholder="Confirmation "
-                            class="form-control userInput">
+                            class="form-control userInput" name="passwordConfirm_input">
 
                         <label for="avatar">Avatar</label>
                         <div id='avatar' class='ImageUploader' defaultImage='images/No_Avatar.png'
@@ -1124,7 +1124,7 @@
                             userToken = null;
                             holdCheckETag = false;
                             */
-                            logoutOfAccount();
+                            logoutOfAccount(false);
                             $(this).dialog("close");
                         }
                     },
@@ -1341,7 +1341,7 @@
             }
         </script>
 
-        <!--           //TODO verifier css dialog image, glitch-->
-</body>
+     <!--           //TODO verifier css dialog image, delete token avec user, tous les keywords,  delete qui marche pu , glitch-->
+    </body>
 
 </html>
