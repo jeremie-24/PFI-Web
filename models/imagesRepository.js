@@ -125,6 +125,7 @@ module.exports =
             let evaluatedKeys = ["Title", "Description"];
             evaluatedKeys.forEach(key => {
                 keywords.forEach(keyword => {
+                    // TODO doit contenir tous les keywords
                     if(!containsKeyword && this.containsKeyword(object[key], keyword)){
                         containsKeyword = true;
                     };
