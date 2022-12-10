@@ -1,4 +1,4 @@
-const host = "http://localhost:5000";
+const host = "http://localhost:5000"; // https://pfi-web-couturier-duquette.glitch.me
 const apiBaseURL = host + "/api/images";
 const tokenBaseURL = host + "/token";
 const userBaseURL = host + "/api/accounts";

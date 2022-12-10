@@ -286,7 +286,8 @@
 
             function getImagesList(refresh = true) {
                 appendMode = !refresh;
-
+                GETUSERNAMES(DisplayUserNames, error);
+                
                 function prepareQueryString() {
                     let queryString = "";
                     let dateSortString = "sort=Date," + dateSort;

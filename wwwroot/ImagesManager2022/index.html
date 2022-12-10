@@ -513,31 +513,33 @@
                     if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
-                                <div class='imageLayout'>
+                                <div class='imageLayout' id="#image_div_${image.Id}">
                                     <div class='imageHeader'>
                                         <div class="imageTitle">${image.Title}</div>
                                     ${header}
                                     </div>
-                                    <a href="${image.OriginalURL}" target="_blank" class="imageContainer">
+                                    <span class="imageContainer" >
                                         <img class="avatarOnImage" src="${imageUrl}" alt="" title="Image de ${image.UserName}" 
                                                 data-toggle="tooltip">
-                                        <div    class='image' 
+                                        <div     
+                                                class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
                                                 >
                                         </div>
-                                    </a>
+                                    </span>
                                     <div class="imageDate">${convertToFrenchDate(parseInt(image.Date))}</div>
                                 </div>
                         `)
                         );
+                        // TODO vérifier ne marche pas!!!!
+                        $(`#image_div_${image.Id}`).click((e) => { imageDetails(image) });
                     }
 
-                    $("#image_div_" + image.Id).click(e => { imageDetails(image) });
+                    
                 }
                 currentETag = ETag;
                 previousScrollPosition = $(".scrollContainer").scrollTop();
                 if (!appendMode) $("#imagesList").empty();
-
                 if (appendMode && images.length == 0)
                     imagesCount -= appendCount;
 
@@ -1340,7 +1342,7 @@
             }
         </script>
 
-        <!--           //TODO keywords storage, glitch-->
+        <!--           //TODO verifier dialog image, glitch-->
 </body>
 
 </html>

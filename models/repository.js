@@ -13,6 +13,7 @@ const utilities = require("../utilities.js");
 const CollectionFilter = require("./collectionFilter.js");
 const CachedRequests = require("../CachedRequestsManager");
 const RepositoryCachesManager = require("./repositoryCachesManager.js");
+var clc = require("cli-color");
 global.repositoryEtags = {};
 
 class Repository {
