@@ -121,8 +121,16 @@ module.exports =
         }
         */
         evaluatedKeysContainsKeyword(object, keywords){
-            let containsKeyword = false;
-            let evaluatedKeys = ["Title", "Description"];
+            let containsKeyword = true;
+            let keysValue = this.getEvaluatedKeysValues(object);
+
+
+            for(let i = 0;containsKeyword && i < keywords.length; i++){
+                containsKeyword = this.containsKeyword(keysValue, keywords[i])
+            }
+
+
+            /*
             evaluatedKeys.forEach(key => {
                 keywords.forEach(keyword => {
                     // TODO doit contenir tous les keywords
@@ -131,7 +139,17 @@ module.exports =
                     };
                 })
             });
+            */
+
             return containsKeyword;
+        }
+        getEvaluatedKeysValues(object){
+            let value = "";
+            let evaluatedKeys = ["Title", "Description"];
+            evaluatedKeys.forEach(key => {
+                value += object[key];
+            });
+            return value;
         }
         containsKeyword(value, keyword){
             return this.valueMatch(value, `*${keyword}*`)
