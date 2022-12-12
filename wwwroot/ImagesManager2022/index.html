@@ -369,7 +369,7 @@
                  //ResetSearchBar();
             }
             function isVerified(user) {
-                return user.VerifyCode == "verified";
+                return user.VerifyCode && user.VerifyCode == "verified";
             }
             function getUserNameSpan(currentUser) {
                 let span = $("<span></span>")
@@ -813,10 +813,11 @@
             }
             function updateAfterModify(modifiedUser) {
 
-                if (modifiedUser.Email != user.Email) {
+                if (modifiedUser.Email && modifiedUser.Email != user.Email /*&& modifiedUser.Email != ""*/) {
                     $("#verifyCodeDlg").dialog('open');
                 }
-                updateUser(modifiedUser);
+                //updateUser(modifiedUser);
+                getUser(userToken);
 
                 let login = getLoginFromUser(modifiedUser);
                 updateRememberMe(login);
@@ -1321,10 +1322,10 @@
                         text: "Oui",
                         click: function () {
                             holdCheckETag = false;
-                            let FormUser = userFromForm();
-                            if (FormUser) {
+                           // let FormUser = userFromForm();
+                            if (user) {
                                 holdCheckETag = false;
-                                DELETE_USER(FormUser.Id, token, () => logoutOfAccount(false), error);
+                                DELETE_USER(user.Id, token, () => logoutOfAccount(false), error);
                             }
                             resetUserForm();
                             $(this).dialog("close");
@@ -1341,7 +1342,7 @@
             }
         </script>
 
-     <!--           //TODO verifier css dialog image, delete token avec user, tous les keywords,  delete qui marche pu , glitch-->
+     <!--           //TODO retester modifier quand change juste nom, verifier css dialog image, delete token avec user, tous les keywords,  delete qui marche pu , glitch-->
     </body>
 
 </html>
