@@ -183,7 +183,7 @@
 
                         <!--<label for="passwordConfirm_input">Confirmation</label>-->
                         <input type="password" id="passwordConfirm_input" placeholder="Confirmation "
-                            class="form-control userInput">
+                            class="form-control userInput" name="passwordConfirm_input">
 
                         <label for="avatar">Avatar</label>
                         <div id='avatar' class='ImageUploader' defaultImage='images/No_Avatar.png'
@@ -369,7 +369,7 @@
                  //ResetSearchBar();
             }
             function isVerified(user) {
-                return user.VerifyCode == "verified";
+                return user.VerifyCode && user.VerifyCode == "verified";
             }
             function getUserNameSpan(currentUser) {
                 let span = $("<span></span>")
@@ -794,6 +794,7 @@
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
                 $("#password_input").prop('required', true);
+                $("#passwordConfirm_input").prop('required', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgDeleteBtn").hide();
                 $("#userDlgOkBtn").text('Créer');
@@ -806,6 +807,8 @@
                 ImageUploader.imageRequired('avatar', false);
                 //TODO régler problème: quand on efface le mot de passe, il est required
                 $("#password_input").prop('required', false);
+                $("#passwordConfirm_input").prop('required', false);
+                
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
                 $("#userDlgDeleteBtn").show();
@@ -813,10 +816,11 @@
             }
             function updateAfterModify(modifiedUser) {
 
-                if (modifiedUser.Email != user.Email) {
+                if (modifiedUser.Email && modifiedUser.Email != user.Email /*&& modifiedUser.Email != ""*/) {
                     $("#verifyCodeDlg").dialog('open');
                 }
-                updateUser(modifiedUser);
+                //updateUser(modifiedUser);
+                getUser(userToken);
 
                 let login = getLoginFromUser(modifiedUser);
                 updateRememberMe(login);
@@ -1124,7 +1128,7 @@
                             userToken = null;
                             holdCheckETag = false;
                             */
-                            logoutOfAccount();
+                            logoutOfAccount(false);
                             $(this).dialog("close");
                         }
                     },
@@ -1321,10 +1325,10 @@
                         text: "Oui",
                         click: function () {
                             holdCheckETag = false;
-                            let FormUser = userFromForm();
-                            if (FormUser) {
+                           // let FormUser = userFromForm();
+                            if (user) {
                                 holdCheckETag = false;
-                                DELETE_USER(FormUser.Id, token, () => logoutOfAccount(false), error);
+                                DELETE_USER(user.Id, token, () => logoutOfAccount(false), error);
                             }
                             resetUserForm();
                             $(this).dialog("close");
@@ -1341,7 +1345,7 @@
             }
         </script>
 
-        <!--           //TODO verifier css dialog image, delete token avec user, tous les keywords,  delete qui marche pu , glitch-->
-</body>
+     <!--           //TODO retester modifier quand change juste nom, verifier css dialog image, delete token avec user, tous les keywords,  delete qui marche pu , glitch-->
+    </body>
 
 </html>

@@ -794,6 +794,7 @@
                 userCreateMode = true;
                 ImageUploader.imageRequired('avatar', true);
                 $("#password_input").prop('required', true);
+                $("#passwordConfirm_input").prop('required', true);
                 $("#userDlg").dialog('option', 'title', "Création de compte");
                 $("#userDlgDeleteBtn").hide();
                 $("#userDlgOkBtn").text('Créer');
@@ -806,6 +807,8 @@
                 ImageUploader.imageRequired('avatar', false);
                 //TODO régler problème: quand on efface le mot de passe, il est required
                 $("#password_input").prop('required', false);
+                $("#passwordConfirm_input").prop('required', false);
+                
                 $("#userDlg").dialog('option', 'title', "Modification de compte");
                 $("#userDlgOkBtn").text('Modifier');
                 $("#userDlgDeleteBtn").show();
