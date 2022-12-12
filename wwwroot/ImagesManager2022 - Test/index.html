@@ -61,8 +61,8 @@
 
                 <span class="cmd fa fa-plus-square verifiedDiv" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                    <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short"></span>
-                    <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"></span>
+                    <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short" title="Trier" data-toggle="tooltip"></span>
+                    <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"  title="Trier" data-toggle="tooltip"></span>
                     <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
                     data-toggle="tooltip"></span>
@@ -74,7 +74,10 @@
             <div class="rightHeaderLayout">
 
                 <div class="loggedDiv">
-                    <span id="modifyUserCmd"><img id="userImage" src="" alt="Image_user"></span>
+                    <span id="modifyUserCmd" title="Modifier l'usager"
+                    data-toggle="tooltip">
+                        <img id="userImage" src="" alt="Image_user">
+                    </span>
                     <span id="usernameContainer">Nom</span>
                 </div>
                 <span class="cmd fa-solid fa-right-to-bracket loginDiv" id="loginCmd" title="Se connecter"
@@ -1344,7 +1347,7 @@
             }
         </script>
 
-     <!--           //TODO tooltip, verifier css dialog image, delete token avec user,  glitch-->
+     <!--           //TODO tooltip, verifier css dialog image, delete token avec user,  glitch, ajouter des images/-->
     </body>
 
 </html>
