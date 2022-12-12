@@ -21,11 +21,12 @@ body {
 }
 .headerLayout {
     display: grid;
-    grid-template-columns: 80px auto 60px 60px  60px 60px ;
+    grid-template-columns: 80px auto 60px 60px 60px 60px;
     align-items: center;
 }
 .imageContainer {
     position: relative;
+    
 }
 #image_avatar {
     max-width: 200px;
@@ -35,13 +36,11 @@ body {
     padding-top:10px;
     margin: 5px;
     border-top: 1px solid lightgray;
-    background-image: linear-gradient(180deg, lightgray, gray);
 }
 .searchBarLayout {
     display: grid;
     grid-template-columns: 0.5fr 40px 1fr 35px 35px 16px;
     align-items: center;
-    
 
 }
 .rightHeaderLayout{
@@ -285,4 +284,9 @@ span2 {
 }
 .unverifiedName{
     color: red;
+}
+#image_avatar{
+    border-radius: 50%;
+    max-width: 30px;
+    height: 30px;
 }

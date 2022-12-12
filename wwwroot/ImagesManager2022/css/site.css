@@ -285,3 +285,8 @@ span2 {
 .unverifiedName{
     color: red;
 }
+#image_avatar{
+    border-radius: 50%;
+    max-width: 30px;
+    height: 30px;
+}
