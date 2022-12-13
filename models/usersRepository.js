@@ -2,6 +2,7 @@ const ImageFilesRepository = require('./imageFilesRepository.js');
 const UserModel = require('./user.js');
 const utilities = require("../utilities");
 const HttpContext = require('../httpContext').get();
+const TokenManager = require('../tokenManager');
 
 module.exports =
     class UsersRepository extends require('./repository') {
@@ -59,6 +60,7 @@ module.exports =
                     }
                 });
                 ImageFilesRepository.removeImageFile(foundUser["AvatarGUID"]);
+                TokenManager.logout(id);
                 return super.remove(id);
             }
             return false;
