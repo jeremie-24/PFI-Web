@@ -52,7 +52,6 @@ module.exports =
             var imagesRepository = new ImagesRepository();
             if (foundUser && token != null && foundUser && id == token["UserId"]) {
 
-                //TODO supprimer les tokens
                 var images = require("../data/Images.json");
                 images.forEach(element => {
                     if (element["UserId"] && element.UserId == id){
