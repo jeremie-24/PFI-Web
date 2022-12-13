@@ -61,7 +61,7 @@
 
                 <span class="cmd fa fa-plus-square verifiedDiv" id="newImageCmd" title="Ajouter un image"
                     data-toggle="tooltip"></span>
-                    <span id="Date_Asc" class="cmd fa-solid fa-arrow-down-wide-short" title="Trier" data-toggle="tooltip"></span>
+                    <span id="Date_Asc" class="cmd fa-solid fa-arrow-up-wide-short" title="Trier" data-toggle="tooltip"></span>
                     <span id="Date_Desc" class="cmd fa-solid fa-arrow-down-short-wide"  title="Trier" data-toggle="tooltip"></span>
                     <span id="SearchCmd" class="cmd fa fa-search" title="Afficher/masquer la barre de recherche" data-toggle="tooltip"></span>
                 <span class="cmd fa fa-user-plus loginDiv" id="newUserCmd" title="Créer un compte"
@@ -517,7 +517,7 @@
                     if (image.Shared || isOwned) {
                         $("#imagesList").append(
                             $(` 
-                                <div class='imageLayout' id="image_div_${image.Id}">
+                                <div class='imageLayout' >
                                     <div class='imageHeader'>
                                         <div class="imageTitle">${image.Title}</div>
                                     ${header}
@@ -525,7 +525,7 @@
                                     <span class="imageContainer" >
                                         <img class="avatarOnImage" src="${imageUrl}" alt="" title="Image de ${image.UserName}" 
                                                 data-toggle="tooltip">
-                                        <div     
+                                        <div id="image_div_${image.Id}"    
                                                 class='image' 
                                                 style="background-image:url('${image.ThumbnailURL}')"
                                                 >
@@ -731,31 +731,7 @@
             }
 
 
-            function editimage(e) {
-                holdCheckETag = true;
-                createMode = false;
-                GET_ID(e.target.getAttribute("imageid"), imageToForm, error);
-                holdCheckETag = true;
-                ImageUploader.imageRequired('image', false);
-                $("#imageDlg").dialog('option', 'title', "Modification d'image");
-                $("#imageDlgOkBtn").text("Modifier");
-                $("#imageDlg").dialog('open');
-            }
-            function deleteimage(e) {
-                holdCheckETag = true;
-                imageIdToDelete = e.target.getAttribute("imageid")
-                GET_ID(
-                    imageIdToDelete,
-                    image => {
-                        $("#confirmationMessage").html("Voulez-vous vraiment effacer l'image <br><b>" + image.Title + "</b>?")
-                    },
-                    error
-                );
-                holdCheckETag = true;
-                $("#confirmDlg").dialog('option', 'title', "Retrait d'image'...");
-                $("#confirmDeleteDlgOkBtn").text("Effacer");
-                $("#confirmDeleteDlg").dialog('open');
-            }
+           
             function resetimageForm() {
                 $("#Id_input").val("0");
                 $("#GUID_input").val("");
@@ -791,7 +767,7 @@
                 $("#title_input").val(image.Title);
                 $("#description_input").val(image.Description);
                 ImageUploader.setImage('image', image.OriginalURL);
-                //TODO shared?
+                $("#shared_input").prop('checked', image.Shared);
             }
 
             function newUser() {
@@ -1068,6 +1044,7 @@
                         click: function () {
                             changeLoginToken();
                             //resetLoginForm();
+                            holdCheckETag = false;
                             $("#loginDlg").dialog("close");
                         }
                     },
@@ -1133,6 +1110,7 @@
                             holdCheckETag = false;
                             */
                             logoutOfAccount(false);
+                            holdCheckETag = false;
                             $(this).dialog("close");
                         }
                     },
